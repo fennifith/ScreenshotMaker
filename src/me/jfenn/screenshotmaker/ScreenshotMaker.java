@@ -5,6 +5,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,6 +34,8 @@ public class ScreenshotMaker {
     private JColorChooserButton jTextColorChooserButton;
     private JColorChooserButton jBackgroundColorChooserButton;
     private JComboBox jExportSizeComboBox;
+    private JButton jImportButton;
+    private JButton jExportButton;
 
     public ScreenshotMaker() {
         try {
@@ -47,8 +51,26 @@ public class ScreenshotMaker {
 
     private void init() {
         jFrame = new JFrame("Screenshot Maker");
-        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        jFrame.setMinimumSize(new Dimension(Math.min((int) (screenSize.width / 1.5), 550), Math.min((int) (screenSize.height / 1.5), 350)));
+        jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        jFrame.setMinimumSize(new Dimension(Math.min((int) (screenSize.width / 1.5), 600), Math.min((int) (screenSize.height / 1.5), 350)));
+        jFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (file == null || isChanged) {
+                    int choice = JOptionPane.showConfirmDialog(
+                            null,
+                            "You have unsaved changes to this template. Would you like to save it first?",
+                            "Save File",
+                            JOptionPane.YES_NO_CANCEL_OPTION);
+
+                    if (choice == JOptionPane.YES_OPTION)
+                        toFile(false);
+
+                    if (choice != JOptionPane.CANCEL_OPTION)
+                        jFrame.dispose();
+                }
+            }
+        });
 
         // --------------------- Menu Elements ------------------ //
 
@@ -80,33 +102,10 @@ public class ScreenshotMaker {
         jFileMenu.addSeparator();
 
         JMenuItem jImportMenu = new JMenuItem("Import Screenshot");
-        jImportMenu.addActionListener(e -> {
-            FileDialog dialog = new FileDialog(jFrame, "Choose a Screenshot");
-            dialog.setMode(FileDialog.LOAD);
-            dialog.setFilenameFilter((dir, name) -> name.endsWith(".png") || name.endsWith("jpg") || name.endsWith("jpeg"));
-            dialog.setVisible(true);
-
-            String file = dialog.getFile();
-            if (file != null) {
-                try {
-                    jScreenshotViewer.setScreenshot(new File(dialog.getDirectory(), file));
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        });
+        jImportMenu.addActionListener(e -> importFile());
         jFileMenu.add(jImportMenu);
         JMenuItem jExportMenu = new JMenuItem("Export Image");
-        jExportMenu.addActionListener(e -> {
-            FileDialog dialog = new FileDialog(jFrame, "Export To...");
-            dialog.setMode(FileDialog.SAVE);
-            dialog.setFilenameFilter((dir, name) -> name.endsWith("png"));
-            dialog.setVisible(true);
-
-            String file = dialog.getFile();
-            if (file != null)
-                jScreenshotViewer.toFile(new File(dialog.getDirectory(), file));
-        });
+        jExportMenu.addActionListener(e -> exportFile());
         jFileMenu.add(jExportMenu);
 
         jMenuBar.add(jFileMenu);
@@ -238,6 +237,13 @@ public class ScreenshotMaker {
         });
         jInputPanel.add(jExportSizeComboBox);
 
+        jImportButton = new JButton("Import Screenshot");
+        jImportButton.addActionListener(e -> importFile());
+        jInputPanel.add(jImportButton);
+
+        jExportButton = new JButton("Export Image");
+        jExportButton.addActionListener(e -> exportFile());
+        jInputPanel.add(jExportButton);
 
         // ------------------------------------------------------ //
 
@@ -272,6 +278,33 @@ public class ScreenshotMaker {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+    }
+
+    private void importFile() {
+        FileDialog dialog = new FileDialog(jFrame, "Choose a Screenshot");
+        dialog.setMode(FileDialog.LOAD);
+        dialog.setFilenameFilter((dir, name) -> name.endsWith(".png") || name.endsWith("jpg") || name.endsWith("jpeg"));
+        dialog.setVisible(true);
+
+        String file = dialog.getFile();
+        if (file != null) {
+            try {
+                jScreenshotViewer.setScreenshot(new File(dialog.getDirectory(), file));
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    private void exportFile() {
+        FileDialog dialog = new FileDialog(jFrame, "Export To...");
+        dialog.setMode(FileDialog.SAVE);
+        dialog.setFilenameFilter((dir, name) -> name.endsWith("png"));
+        dialog.setVisible(true);
+
+        String file = dialog.getFile();
+        if (file != null)
+            jScreenshotViewer.toFile(new File(dialog.getDirectory(), file));
     }
 
     private void fromFile(File file, boolean newWindow) {
