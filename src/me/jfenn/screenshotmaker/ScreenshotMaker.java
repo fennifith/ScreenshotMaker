@@ -158,7 +158,7 @@ public class ScreenshotMaker {
             @Override
             public void keyReleased(KeyEvent e) {
                 jScreenshotViewer.setTitle(jTitleTextField.getText());
-                isChanged = true;
+                onValueChange();
             }
         });
         jInputPanel.add(jTitleTextField);
@@ -177,7 +177,7 @@ public class ScreenshotMaker {
             @Override
             public void keyReleased(KeyEvent e) {
                 jScreenshotViewer.setDescription(jDescriptionTextField.getText());
-                isChanged = true;
+                onValueChange();
             }
         });
         jInputPanel.add(jDescriptionTextField);
@@ -186,7 +186,7 @@ public class ScreenshotMaker {
         jTextSizeSpinner = new JSpinner(new SpinnerNumberModel(14, 1, 50, 1));
         jTextSizeSpinner.addChangeListener(e -> {
             jScreenshotViewer.setTextSize((int) jTextSizeSpinner.getValue());
-            isChanged = true;
+            onValueChange();
         });
         jInputPanel.add(jTextSizeSpinner);
 
@@ -194,7 +194,7 @@ public class ScreenshotMaker {
         jTextPositionComboBox = new JComboBox<>(new String[]{"Above", "Below"});
         jTextPositionComboBox.addActionListener(e -> {
             jScreenshotViewer.setPosition(jTextPositionComboBox.getSelectedIndex() == 1);
-            isChanged = true;
+            onValueChange();
         });
         jInputPanel.add(jTextPositionComboBox);
 
@@ -202,7 +202,7 @@ public class ScreenshotMaker {
         jOffsetSpinner = new JSpinner(new SpinnerNumberModel(0, -10, 100, 1));
         jOffsetSpinner.addChangeListener(e -> {
             jScreenshotViewer.setOffset((float) (int) jOffsetSpinner.getValue() / 100);
-            isChanged = true;
+            onValueChange();
         });
         jInputPanel.add(jOffsetSpinner);
 
@@ -210,7 +210,7 @@ public class ScreenshotMaker {
         jTextColorChooserButton = new JColorChooserButton(Color.WHITE);
         jTextColorChooserButton.addColorListener(color -> {
             jScreenshotViewer.setTextColor(color);
-            isChanged = true;
+            onValueChange();
         });
         jInputPanel.add(jTextColorChooserButton);
 
@@ -218,7 +218,7 @@ public class ScreenshotMaker {
         jBackgroundColorChooserButton = new JColorChooserButton(Color.BLACK);
         jBackgroundColorChooserButton.addColorListener(color -> {
             jScreenshotViewer.setBackgroundColor(color);
-            isChanged = true;
+            onValueChange();
         });
         jInputPanel.add(jBackgroundColorChooserButton);
 
@@ -234,7 +234,7 @@ public class ScreenshotMaker {
                     jScreenshotViewer.setExportSize(1920);
                     break;
             }
-            isChanged = true;
+            onValueChange();
         });
         jInputPanel.add(jExportSizeComboBox);
 
@@ -249,6 +249,12 @@ public class ScreenshotMaker {
         jFrame.pack();
         jFrame.setLocation((screenSize.width / 2) - (jFrame.getWidth() / 2), (screenSize.height / 2) - (jFrame.getHeight() / 2));
         jFrame.setVisible(true);
+    }
+
+    private void onValueChange() {
+        isChanged = true;
+        if (file != null)
+            jFrame.setTitle(file.getName() + " *");
     }
 
     private void newProcess(String... args) {
