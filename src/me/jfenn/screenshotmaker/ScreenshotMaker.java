@@ -273,17 +273,12 @@ public class ScreenshotMaker {
             if (newWindow) {
                 boolean isTempChanged = false;
                 if (isChanged) {
-                    JOptionPane jOptionPane = new JOptionPane(
+                    isTempChanged = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
+                            null,
                             "Would you like to open this file in a new window?",
-                            JOptionPane.QUESTION_MESSAGE,
-                            JOptionPane.YES_NO_OPTION);
-                    JDialog jDialog = new JDialog(jFrame, "Open File", true);
-                    jDialog.setContentPane(jOptionPane);
-                    jDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-                    jDialog.pack();
-                    jDialog.setVisible(true);
-
-                    isTempChanged = jOptionPane.getValue().equals(JOptionPane.YES_OPTION);
+                            "Open File",
+                            JOptionPane.YES_NO_OPTION
+                    );
                 }
 
                 if (isTempChanged) {
@@ -343,6 +338,7 @@ public class ScreenshotMaker {
 
                 scanner.close();
                 this.file = file;
+                jFrame.setTitle(file.getName());
                 isChanged = false;
             }
         }
@@ -383,13 +379,18 @@ public class ScreenshotMaker {
 
                 writer.close();
                 this.file = file;
+                jFrame.setTitle(file.getName());
             }
         }
     }
 
     public static void main(String... args) {
         ScreenshotMaker maker = new ScreenshotMaker();
-        if (args.length > 0 && args[0] != null)
+        if (args.length > 0 && args[0] != null) {
             maker.fromFile(new File(args[0]), false);
+            Point point = maker.jFrame.getLocation();
+            point.setLocation(point.x + 20, point.y + 20);
+            maker.jFrame.setLocation(point);
+        }
     }
 }
