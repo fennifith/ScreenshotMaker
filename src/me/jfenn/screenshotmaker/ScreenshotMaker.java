@@ -48,8 +48,7 @@ public class ScreenshotMaker {
     private void init() {
         jFrame = new JFrame("Screenshot Maker");
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        jFrame.setSize(Math.min((int) (screenSize.width / 1.5), 800), Math.min((int) (screenSize.height / 1.5), 800));
-        jFrame.setResizable(false);
+        jFrame.setMinimumSize(new Dimension(Math.min((int) (screenSize.width / 1.5), 550), Math.min((int) (screenSize.height / 1.5), 350)));
 
         // --------------------- Menu Elements ------------------ //
 
@@ -137,11 +136,7 @@ public class ScreenshotMaker {
 
         // ------------------- Drawing Elements ----------------- //
 
-        JPanel jMainPanel = new JPanel();
-        jMainPanel.setLayout(new GridLayout(1, 2));
-
         jScreenshotViewer = new JScreenshotViewer();
-        jMainPanel.add(jScreenshotViewer);
 
         // --------------------- Input Elements ----------------- //
 
@@ -150,7 +145,7 @@ public class ScreenshotMaker {
         jInputPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         jInputPanel.add(new JLabel("Title"));
-        jTitleTextField = new JTextField("Title");
+        jTitleTextField = new JTextField("Title", 10);
         jTitleTextField.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -169,7 +164,7 @@ public class ScreenshotMaker {
         jInputPanel.add(jTitleTextField);
 
         jInputPanel.add(new JLabel("Description"));
-        jDescriptionTextField = new JTextField("Description");
+        jDescriptionTextField = new JTextField("Description", 10);
         jDescriptionTextField.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -243,14 +238,13 @@ public class ScreenshotMaker {
         });
         jInputPanel.add(jExportSizeComboBox);
 
-        jMainPanel.add(jInputPanel);
-
 
         // ------------------------------------------------------ //
 
         Container contentPane = jFrame.getContentPane();
         contentPane.add(BorderLayout.NORTH, jMenuBar);
-        contentPane.add(BorderLayout.WEST, jMainPanel);
+        contentPane.add(BorderLayout.WEST, jScreenshotViewer);
+        contentPane.add(BorderLayout.EAST, jInputPanel);
 
         jFrame.pack();
         jFrame.setLocation((screenSize.width / 2) - (jFrame.getWidth() / 2), (screenSize.height / 2) - (jFrame.getHeight() / 2));

@@ -172,6 +172,17 @@ public class JScreenshotViewer extends JComponent {
         return new Dimension((getHeight() * 720) / 1280, getHeight());
     }
 
+    @Override
+    public Dimension getSize(Dimension rv) {
+        rv.setSize((getHeight() * 720) / 1280, getHeight());
+        return rv;
+    }
+
+    @Override
+    public Dimension getSize() {
+        return new Dimension((getHeight() * 720) / 1280, getHeight());
+    }
+
     private static BufferedImage progressiveResize(BufferedImage source, int width) {
         int height = width * source.getHeight() / source.getWidth();
         int w = Math.max(source.getWidth() / 2, width);
