@@ -9,9 +9,6 @@ import java.io.IOException;
 
 public class JScreenshotViewer extends JComponent {
 
-    public static final int POSITION_ABOVE = 0;
-    public static final int POSITION_BELOW = 1;
-
     private String title, description;
     private int textSize;
     private boolean reversePosition;
@@ -32,7 +29,7 @@ public class JScreenshotViewer extends JComponent {
         exportHeight = 1920;
 
         try {
-            frame = ImageIO.read(new File("assets", "pixel_2_frame.png"));
+            frame = ImageIO.read(JScreenshotViewer.class.getResourceAsStream("/assets/pixel_2_frame.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
