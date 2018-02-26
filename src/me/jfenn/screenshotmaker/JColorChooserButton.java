@@ -41,7 +41,6 @@ public class JColorChooserButton extends JButton implements ActionListener {
 
             setIcon(createIcon(color, 16, 16));
             setText(String.format("#%06X", (0xFFFFFF & color.getRGB())));
-            repaint();
         }
     }
 
