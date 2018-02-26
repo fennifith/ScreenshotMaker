@@ -13,7 +13,8 @@ public class JScreenshotViewer extends JComponent {
     public static final int POSITION_BELOW = 1;
 
     private String title, description;
-    private int textSize, position;
+    private int textSize;
+    private boolean reversePosition;
     private float offset;
     private Color textColor, backgroundColor;
     private int exportHeight;
@@ -55,8 +56,8 @@ public class JScreenshotViewer extends JComponent {
         repaint();
     }
 
-    public void setPosition(int position) {
-        this.position = position;
+    public void setPosition(boolean reversePosition) {
+        this.reversePosition = reversePosition;
         repaint();
     }
 
@@ -114,35 +115,52 @@ public class JScreenshotViewer extends JComponent {
 
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setFont(new Font("Roboto", Font.BOLD, (int) (((float) height / 300) * textSize)));
             g2.setColor(textColor);
-            FontMetrics fontMetrics = g2.getFontMetrics();
 
-            g2.drawString(title, ((float) width / 2) - ((float) fontMetrics.stringWidth(title) / 2), start);
-            start += fontMetrics.getHeight();
+            FontMetrics fontMetrics;
+
+            if (!reversePosition) {
+                g2.setFont(new Font("Roboto", Font.BOLD, (int) (((float) height / 300) * textSize)));
+                fontMetrics = g2.getFontMetrics();
+
+                g2.drawString(title, ((float) width / 2) - ((float) fontMetrics.stringWidth(title) / 2), start);
+                start += fontMetrics.getHeight();
+            }
 
             g2.setFont(new Font("Roboto", Font.PLAIN, (int) (((float) height / 400) * textSize)));
             fontMetrics = g2.getFontMetrics();
 
-            g2.drawString(description, ((float) width / 2) - ((float) fontMetrics.stringWidth(description) / 2), start);
-            start += fontMetrics.getHeight() + (offset * height / 4);
+            g2.drawString(description, ((float) width / 2) - ((float) fontMetrics.stringWidth(description) / 2), reversePosition ? height - start : start);
+            start += fontMetrics.getHeight();
+
+            if (reversePosition) {
+                g2.setFont(new Font("Roboto", Font.BOLD, (int) (((float) height / 300) * textSize)));
+                fontMetrics = g2.getFontMetrics();
+
+                g2.drawString(title, ((float) width / 2) - ((float) fontMetrics.stringWidth(title) / 2), height - start);
+                start += fontMetrics.getHeight();
+            }
 
             if (frame != null && (resizedFrame == null || resizedFrame.getWidth() != (int) (width * 0.9))) {
                 resizedFrame = progressiveResize(frame, (int) (width * 0.9));
             }
 
             if (resizedFrame != null) {
+                start += (offset * height / 4);
+
                 int frameSide = this.frameSide * resizedFrame.getWidth() / frame.getWidth();
                 int frameTop = this.frameTop * resizedFrame.getHeight() / frame.getHeight();
 
-                g2.drawImage(resizedFrame, (width / 2) - (resizedFrame.getWidth() / 2), (int) start, null);
+                g2.drawImage(resizedFrame, (width / 2) - (resizedFrame.getWidth() / 2), (int) (reversePosition ? height - start - resizedFrame.getHeight() : start), null);
 
                 if (screenshot != null && (resizedScreenshot == null || resizedScreenshot.getWidth() != resizedFrame.getWidth() - (frameSide * 2))) {
                     resizedScreenshot = progressiveResize(screenshot, resizedFrame.getWidth() - (frameSide * 2));
                 }
 
+                start += frameTop;
+
                 if (resizedScreenshot != null) {
-                    g2.drawImage(resizedScreenshot, (width / 2) - (resizedScreenshot.getWidth() / 2), (int) start + frameTop, null);
+                    g2.drawImage(resizedScreenshot, (width / 2) - (resizedScreenshot.getWidth() / 2), (int) (reversePosition ? height - start - resizedScreenshot.getHeight() : start), null);
                 }
             }
         }

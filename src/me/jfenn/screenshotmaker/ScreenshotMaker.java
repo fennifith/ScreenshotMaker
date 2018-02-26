@@ -2,11 +2,7 @@ package me.jfenn.screenshotmaker;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -202,7 +198,7 @@ public class ScreenshotMaker {
         jInputPanel.add(new JLabel("Text Position"));
         jTextPositionComboBox = new JComboBox<>(new String[]{"Above", "Below"});
         jTextPositionComboBox.addActionListener(e -> {
-            jScreenshotViewer.setPosition(jTextPositionComboBox.getSelectedIndex());
+            jScreenshotViewer.setPosition(jTextPositionComboBox.getSelectedIndex() == 1);
             isChanged = true;
         });
         jInputPanel.add(jTextPositionComboBox);
@@ -326,7 +322,7 @@ public class ScreenshotMaker {
                     jScreenshotViewer.setTextSize(textSize);
                     int position = scanner.nextInt();
                     jTextPositionComboBox.setSelectedIndex(position);
-                    jScreenshotViewer.setPosition(position);
+                    jScreenshotViewer.setPosition(position == 1);
                     int offset = scanner.nextInt();
                     jOffsetSpinner.setValue(offset);
                     jScreenshotViewer.setOffset((float) offset / 100);
