@@ -67,7 +67,7 @@ public class ScreenshotMaker {
         jFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (isChanged) {
+                if (isChanged && file != null) {
                     int choice = JOptionPane.showConfirmDialog(
                             null,
                             "You have unsaved changes to this template. Would you like to save it first?",
