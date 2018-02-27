@@ -47,6 +47,8 @@ public class ScreenshotMaker {
     private File lastImportFile;
     private File lastExportFile;
     private File lastSaveFile;
+    private String lastFont;
+    private Integer lastExportSize;
 
     public ScreenshotMaker() {
         try {
@@ -224,10 +226,27 @@ public class ScreenshotMaker {
         jInputPanel.add(jTextSizeSpinner);
 
         jInputPanel.add(new JLabel("Text Font"));
-        jTextFontComboBox = new JComboBox<>(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
+
+        String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+        String selectedFont = fonts[0];
+        if (lastFont != null)
+            selectedFont = lastFont;
+        else {
+            for (String font : fonts) {
+                if (font.contains("Roboto")) {
+                    selectedFont = font;
+                    break;
+                }
+            }
+        }
+
+        jTextFontComboBox = new JComboBox<>(fonts);
         jTextFontComboBox.setPreferredSize(new Dimension(100, jTextFontComboBox.getMinimumSize().height));
+        jTextFontComboBox.setSelectedItem(selectedFont);
+        jScreenshotViewer.setTextFont(selectedFont);
         jTextFontComboBox.addActionListener(e -> {
-            jScreenshotViewer.setTextFont((String) jTextFontComboBox.getSelectedItem());
+            lastFont = (String) jTextFontComboBox.getSelectedItem();
+            jScreenshotViewer.setTextFont(lastFont);
             onValueChange();
         });
         jInputPanel.add(jTextFontComboBox);
@@ -266,16 +285,12 @@ public class ScreenshotMaker {
 
         jInputPanel.add(new JLabel("Export Size"));
         jExportSizeComboBox = new JComboBox<>(new String[]{"720x1280", "1080x1920"});
-        jExportSizeComboBox.setSelectedIndex(1);
+        int exportSize = lastExportSize != null ? lastExportSize : 1;
+        jExportSizeComboBox.setSelectedIndex(exportSize);
+        jScreenshotViewer.setExportSize(exportSize);
         jExportSizeComboBox.addActionListener(e -> {
-            switch (jExportSizeComboBox.getSelectedIndex()) {
-                case 0:
-                    jScreenshotViewer.setExportSize(1280);
-                    break;
-                case 1:
-                    jScreenshotViewer.setExportSize(1920);
-                    break;
-            }
+            lastExportSize = jExportSizeComboBox.getSelectedIndex();
+            jScreenshotViewer.setExportSize(lastExportSize);
             onValueChange();
         });
         jInputPanel.add(jExportSizeComboBox);
@@ -346,6 +361,15 @@ public class ScreenshotMaker {
                         case "lastSaveFile":
                             lastSaveFile = new File(pref[1]);
                             break;
+                        case "lastFont":
+                            lastFont = pref[1];
+                            break;
+                        case "lastExportSize":
+                            try {
+                                lastExportSize = Integer.parseInt(pref[1]);
+                            } catch (NumberFormatException ignored) {
+                            }
+                            break;
                     }
                 }
             }
@@ -377,6 +401,10 @@ public class ScreenshotMaker {
                 writer.println("lastExportFile=" + lastExportFile.getAbsolutePath());
             if (lastSaveFile != null)
                 writer.println("lastSaveFile=" + lastSaveFile.getAbsolutePath());
+            if (lastFont != null)
+                writer.println("lastFont=" + lastFont);
+            if (lastExportSize != null)
+                writer.println("lastExportSize=" + lastExportSize);
 
             writer.close();
         }
@@ -510,14 +538,7 @@ public class ScreenshotMaker {
                                     try {
                                         int exportSize = Integer.parseInt(line[1]);
                                         jExportSizeComboBox.setSelectedIndex(exportSize);
-                                        switch (exportSize) {
-                                            case 0:
-                                                jScreenshotViewer.setExportSize(1280);
-                                                break;
-                                            case 1:
-                                                jScreenshotViewer.setExportSize(1920);
-                                                break;
-                                        }
+                                        jScreenshotViewer.setExportSize(exportSize);
                                     } catch (NumberFormatException ignored) {
                                     }
                                     break;

@@ -80,8 +80,15 @@ public class JScreenshotViewer extends JComponent {
         repaint();
     }
 
-    public void setExportSize(int height) {
-        exportHeight = height;
+    public void setExportSize(int exportSize) {
+        switch (exportSize) {
+            case 0:
+                exportHeight = 1280;
+                break;
+            case 1:
+                exportHeight = 1920;
+                break;
+        }
     }
 
     public void setScreenshot(File file) throws IOException {
