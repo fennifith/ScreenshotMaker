@@ -124,23 +124,26 @@ public class ScreenshotMaker {
 
         JMenu jHelpMenu = new JMenu("Help");
 
-        JMenuItem jDesktopMenu = new JMenuItem("Create Desktop Entry");
-        jDesktopMenu.addActionListener(e -> {
-            try {
-                new ProcessBuilder(
-                        "sudo",
-                        System.getProperty("java.home") + "/bin/java",
-                        "-classpath",
-                        Arrays.stream(((URLClassLoader) Thread.currentThread().getContextClassLoader()).getURLs())
-                                .map(URL::getFile)
-                                .collect(Collectors.joining(File.pathSeparator)),
-                        DesktopEntryCreator.class.getCanonicalName()
-                ).inheritIO().start();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        });
-        jHelpMenu.add(jDesktopMenu);
+        if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+            JMenuItem jDesktopMenu = new JMenuItem("Create Desktop Entry");
+            jDesktopMenu.addActionListener(e -> {
+                try {
+                    new ProcessBuilder(
+                            "/usr/bin/sudo",
+                            System.getProperty("java.home") + "/bin/java",
+                            "-classpath",
+                            Arrays.stream(((URLClassLoader) Thread.currentThread().getContextClassLoader()).getURLs())
+                                    .map(URL::getFile)
+                                    .collect(Collectors.joining(File.pathSeparator)),
+                            DesktopEntryCreator.class.getCanonicalName()
+                    ).inheritIO().start();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            });
+            jHelpMenu.add(jDesktopMenu);
+        }
+
         JMenuItem jAboutMenu = new JMenuItem("About");
         jAboutMenu.addActionListener(e -> {
             try {
