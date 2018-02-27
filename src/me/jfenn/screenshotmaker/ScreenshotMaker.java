@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 public class ScreenshotMaker {
 
+    private static final int VERSION = 1;
     private static final String PATH_CONFIG_FILE = System.getProperty("user.home") + "/.config/screenshotmaker/main.conf";
     private static final String PATH_IMPORT_FOLDER = System.getProperty("user.home") + "/Pictures/Screenshots";
     private static final String PATH_EXPORT_FILE = System.getProperty("user.home") + "/Pictures/%1$s.png";
@@ -438,47 +439,87 @@ public class ScreenshotMaker {
             }
 
             if (scanner != null) {
-                try {
-                    String title = scanner.nextLine();
-                    jTitleTextField.setText(title);
-                    jScreenshotViewer.setTitle(title);
-                    String description = scanner.nextLine();
-                    jDescriptionTextField.setText(description);
-                    jScreenshotViewer.setDescription(description);
-                    int textSize = scanner.nextInt();
-                    jTextSizeSpinner.setValue(textSize);
-                    jScreenshotViewer.setTextSize(textSize);
-                    int position = scanner.nextInt();
-                    jTextPositionComboBox.setSelectedIndex(position);
-                    jScreenshotViewer.setPosition(position == 1);
-                    int offset = scanner.nextInt();
-                    jOffsetSpinner.setValue(offset);
-                    jScreenshotViewer.setOffset((float) offset / 100);
-                    Color textColor = new Color(scanner.nextInt());
-                    jTextColorChooserButton.setColor(textColor);
-                    jScreenshotViewer.setTextColor(textColor);
-                    Color backgroundColor = new Color(scanner.nextInt());
-                    jBackgroundColorChooserButton.setColor(backgroundColor);
-                    jScreenshotViewer.setBackgroundColor(backgroundColor);
-                    int exportSize = scanner.nextInt();
-                    jExportSizeComboBox.setSelectedIndex(exportSize);
-                    switch (exportSize) {
-                        case 0:
-                            jScreenshotViewer.setExportSize(1280);
-                            break;
-                        case 1:
-                            jScreenshotViewer.setExportSize(1920);
-                            break;
+                String[] version = scanner.nextLine().split("=");
+                if (version.length > 1 && version[1].equals(VERSION + "")) {
+                    while (scanner.hasNext()) {
+                        String[] line = scanner.nextLine().split("=");
+                        if (line.length > 1) {
+                            switch (line[0]) {
+                                case "title":
+                                    jTitleTextField.setText(line[1]);
+                                    jScreenshotViewer.setTitle(line[1]);
+                                    break;
+                                case "description":
+                                    jDescriptionTextField.setText(line[1]);
+                                    jScreenshotViewer.setDescription(line[1]);
+                                    break;
+                                case "textSize":
+                                    try {
+                                        int textSize = Integer.parseInt(line[1]);
+                                        jTextSizeSpinner.setValue(textSize);
+                                        jScreenshotViewer.setTextSize(textSize);
+                                    } catch (NumberFormatException ignored) {
+                                    }
+                                    break;
+                                case "position":
+                                    try {
+                                        int position = Integer.parseInt(line[1]);
+                                        jTextPositionComboBox.setSelectedIndex(position);
+                                        jScreenshotViewer.setPosition(position == 1);
+                                    } catch (NumberFormatException ignored) {
+                                    }
+                                    break;
+                                case "offset":
+                                    try {
+                                        int offset = Integer.parseInt(line[1]);
+                                        jOffsetSpinner.setValue(offset);
+                                        jScreenshotViewer.setOffset((float) offset / 100);
+                                    } catch (NumberFormatException ignored) {
+                                    }
+                                    break;
+                                case "textColor":
+                                    try {
+                                        Color textColor = new Color(Integer.parseInt(line[1]));
+                                        jTextColorChooserButton.setColor(textColor);
+                                        jScreenshotViewer.setTextColor(textColor);
+                                    } catch (NumberFormatException ignored) {
+                                    }
+                                    break;
+                                case "backgroundColor":
+                                    try {
+                                        Color backgroundColor = new Color(Integer.parseInt(line[1]));
+                                        jBackgroundColorChooserButton.setColor(backgroundColor);
+                                        jScreenshotViewer.setBackgroundColor(backgroundColor);
+                                    } catch (NumberFormatException ignored) {
+                                    }
+                                    break;
+                                case "exportSize":
+                                    try {
+                                        int exportSize = Integer.parseInt(line[1]);
+                                        jExportSizeComboBox.setSelectedIndex(exportSize);
+                                        switch (exportSize) {
+                                            case 0:
+                                                jScreenshotViewer.setExportSize(1280);
+                                                break;
+                                            case 1:
+                                                jScreenshotViewer.setExportSize(1920);
+                                                break;
+                                        }
+                                    } catch (NumberFormatException ignored) {
+                                    }
+                                    break;
+                            }
+                        }
                     }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    this.file = file;
+                    jFrame.setTitle(file.getName());
+                    isChanged = false;
+                } else {
+                    JOptionPane.showMessageDialog(jFrame, "This file was created by a different version of Screenshot Maker and is incompatible.", "Invalid File", JOptionPane.ERROR_MESSAGE);
                 }
 
                 scanner.close();
-                this.file = file;
-                jFrame.setTitle(file.getName());
-                isChanged = false;
             }
         }
     }
@@ -507,18 +548,20 @@ public class ScreenshotMaker {
             }
 
             if (writer != null) {
-                writer.println(jTitleTextField.getText());
-                writer.println(jDescriptionTextField.getText());
-                writer.println((int) jTextSizeSpinner.getValue());
-                writer.println(jTextPositionComboBox.getSelectedIndex());
-                writer.println((int) jOffsetSpinner.getValue());
-                writer.println(jTextColorChooserButton.getColor().getRGB());
-                writer.println(jBackgroundColorChooserButton.getColor().getRGB());
-                writer.println(jExportSizeComboBox.getSelectedIndex());
+                writer.println("v=" + VERSION);
+                writer.println("title=" + jTitleTextField.getText());
+                writer.println("description=" + jDescriptionTextField.getText());
+                writer.println("textSize=" + (int) jTextSizeSpinner.getValue());
+                writer.println("position=" + jTextPositionComboBox.getSelectedIndex());
+                writer.println("offset=" + (int) jOffsetSpinner.getValue());
+                writer.println("textColor=" + jTextColorChooserButton.getColor().getRGB());
+                writer.println("backgroundColor=" + jBackgroundColorChooserButton.getColor().getRGB());
+                writer.println("exportSize=" + jExportSizeComboBox.getSelectedIndex());
 
                 writer.close();
                 this.file = lastSaveFile = file;
                 jFrame.setTitle(file.getName());
+                isChanged = false;
             }
         }
     }
