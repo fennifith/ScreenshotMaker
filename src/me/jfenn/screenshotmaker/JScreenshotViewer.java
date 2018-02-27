@@ -11,6 +11,7 @@ public class JScreenshotViewer extends JComponent {
 
     private String title, description;
     private int textSize;
+    private String textFont;
     private boolean reversePosition;
     private float offset;
     private Color textColor, backgroundColor;
@@ -24,6 +25,7 @@ public class JScreenshotViewer extends JComponent {
         title = "Title";
         description = "Description";
         textSize = 14;
+        textFont = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()[0];
         textColor = Color.WHITE;
         backgroundColor = Color.BLACK;
         exportHeight = 1920;
@@ -50,6 +52,11 @@ public class JScreenshotViewer extends JComponent {
 
     public void setTextSize(int textSize) {
         this.textSize = textSize;
+        repaint();
+    }
+
+    public void setTextFont(String textFont) {
+        this.textFont = textFont;
         repaint();
     }
 
@@ -117,21 +124,21 @@ public class JScreenshotViewer extends JComponent {
             FontMetrics fontMetrics;
 
             if (!reversePosition) {
-                g2.setFont(new Font("Roboto", Font.BOLD, (int) (((float) height / 300) * textSize)));
+                g2.setFont(new Font(textFont, Font.BOLD, (int) (((float) height / 300) * textSize)));
                 fontMetrics = g2.getFontMetrics();
 
                 g2.drawString(title, ((float) width / 2) - ((float) fontMetrics.stringWidth(title) / 2), start);
                 start += fontMetrics.getHeight();
             }
 
-            g2.setFont(new Font("Roboto", Font.PLAIN, (int) (((float) height / 400) * textSize)));
+            g2.setFont(new Font(textFont, Font.PLAIN, (int) (((float) height / 400) * textSize)));
             fontMetrics = g2.getFontMetrics();
 
             g2.drawString(description, ((float) width / 2) - ((float) fontMetrics.stringWidth(description) / 2), reversePosition ? height - start : start);
             start += fontMetrics.getHeight();
 
             if (reversePosition) {
-                g2.setFont(new Font("Roboto", Font.BOLD, (int) (((float) height / 300) * textSize)));
+                g2.setFont(new Font(textFont, Font.BOLD, (int) (((float) height / 300) * textSize)));
                 fontMetrics = g2.getFontMetrics();
 
                 g2.drawString(title, ((float) width / 2) - ((float) fontMetrics.stringWidth(title) / 2), height - start);

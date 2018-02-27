@@ -35,6 +35,7 @@ public class ScreenshotMaker {
     private JTextField jTitleTextField;
     private JTextField jDescriptionTextField;
     private JSpinner jTextSizeSpinner;
+    private JComboBox<String> jTextFontComboBox;
     private JComboBox<String> jTextPositionComboBox;
     private JSpinner jOffsetSpinner;
     private JColorChooserButton jTextColorChooserButton;
@@ -221,6 +222,14 @@ public class ScreenshotMaker {
             onValueChange();
         });
         jInputPanel.add(jTextSizeSpinner);
+
+        jInputPanel.add(new JLabel("Text Font"));
+        jTextFontComboBox = new JComboBox<>(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
+        jTextFontComboBox.addActionListener(e -> {
+            jScreenshotViewer.setTextFont((String) jTextFontComboBox.getSelectedItem());
+            onValueChange();
+        });
+        jInputPanel.add(jTextFontComboBox);
 
         jInputPanel.add(new JLabel("Text Position"));
         jTextPositionComboBox = new JComboBox<>(new String[]{"Above", "Below"});
@@ -461,6 +470,9 @@ public class ScreenshotMaker {
                                     } catch (NumberFormatException ignored) {
                                     }
                                     break;
+                                case "textFont":
+                                    jTextFontComboBox.setSelectedItem(line[1]);
+                                    break;
                                 case "position":
                                     try {
                                         int position = Integer.parseInt(line[1]);
@@ -552,6 +564,7 @@ public class ScreenshotMaker {
                 writer.println("title=" + jTitleTextField.getText());
                 writer.println("description=" + jDescriptionTextField.getText());
                 writer.println("textSize=" + (int) jTextSizeSpinner.getValue());
+                writer.println("textFont=" + jTextFontComboBox.getSelectedItem());
                 writer.println("position=" + jTextPositionComboBox.getSelectedIndex());
                 writer.println("offset=" + (int) jOffsetSpinner.getValue());
                 writer.println("textColor=" + jTextColorChooserButton.getColor().getRGB());
