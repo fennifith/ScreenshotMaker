@@ -225,6 +225,7 @@ public class ScreenshotMaker {
 
         jInputPanel.add(new JLabel("Text Font"));
         jTextFontComboBox = new JComboBox<>(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
+        jTextFontComboBox.setPreferredSize(new Dimension(100, jTextFontComboBox.getMinimumSize().height));
         jTextFontComboBox.addActionListener(e -> {
             jScreenshotViewer.setTextFont((String) jTextFontComboBox.getSelectedItem());
             onValueChange();
