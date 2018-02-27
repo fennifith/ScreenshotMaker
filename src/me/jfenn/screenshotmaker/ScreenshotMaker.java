@@ -20,6 +20,11 @@ import java.util.stream.Collectors;
 
 public class ScreenshotMaker {
 
+    private static final String PATH_CONFIG_FILE = System.getProperty("user.home") + "/.config/screenshotmaker/main.conf";
+    private static final String PATH_IMPORT_FOLDER = System.getProperty("user.home") + "/Pictures/Screenshots";
+    private static final String PATH_EXPORT_FILE = System.getProperty("user.home") + "/Pictures/%1$s.png";
+    private static final String PATH_SAVE_FILE = System.getProperty("user.home") + "/ScreenshotMaker/untitled.sm";
+
     private Dimension screenSize;
     private File file;
     private boolean isChanged;
@@ -37,6 +42,10 @@ public class ScreenshotMaker {
     private JButton jImportButton;
     private JButton jExportButton;
 
+    private File lastImportFile;
+    private File lastExportFile;
+    private File lastSaveFile;
+
     public ScreenshotMaker() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -45,7 +54,7 @@ public class ScreenshotMaker {
         }
 
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
+        readConfig();
         init();
     }
 
@@ -56,7 +65,7 @@ public class ScreenshotMaker {
         jFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (file == null || isChanged) {
+                if (isChanged) {
                     int choice = JOptionPane.showConfirmDialog(
                             null,
                             "You have unsaved changes to this template. Would you like to save it first?",
@@ -65,10 +74,13 @@ public class ScreenshotMaker {
 
                     if (choice == JOptionPane.YES_OPTION)
                         toFile(false);
-
-                    if (choice != JOptionPane.CANCEL_OPTION)
-                        jFrame.dispose();
+                    else if (choice == JOptionPane.CANCEL_OPTION)
+                        return;
                 }
+
+                writeConfig();
+                jFrame.dispose();
+                System.exit(0);
             }
         });
 
@@ -82,9 +94,9 @@ public class ScreenshotMaker {
         jFileMenu.add(jNewItem);
         JMenuItem jOpenMenu = new JMenuItem("Open");
         jOpenMenu.addActionListener(e -> {
-            FileDialog dialog = new FileDialog(jFrame, "Select a File to Open");
-            dialog.setMode(FileDialog.LOAD);
+            FgFileDialog dialog = new FgFileDialog(jFrame, "Select a File to Open", FileDialog.LOAD);
             dialog.setFilenameFilter((dir, name) -> name.endsWith(".sm"));
+            dialog.setFile(lastSaveFile != null ? lastSaveFile.getAbsolutePath() : PATH_SAVE_FILE);
             dialog.setVisible(true);
 
             String file = dialog.getFile();
@@ -297,16 +309,77 @@ public class ScreenshotMaker {
         }
     }
 
+    private void readConfig() {
+        Scanner scanner = null;
+
+        try {
+            scanner = new Scanner(new File(PATH_CONFIG_FILE));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (scanner != null) {
+            while (scanner.hasNext()) {
+                String[] pref = scanner.nextLine().split("=");
+                if (pref.length > 1) {
+                    switch (pref[0]) {
+                        case "lastImportFile":
+                            lastImportFile = new File(pref[1]);
+                            break;
+                        case "lastExportFile":
+                            lastExportFile = new File(pref[1]);
+                            break;
+                        case "lastSaveFile":
+                            lastSaveFile = new File(pref[1]);
+                            break;
+                    }
+                }
+            }
+
+            scanner.close();
+        }
+    }
+
+    private void writeConfig() {
+        File file = new File(PATH_CONFIG_FILE);
+        PrintWriter writer = null;
+
+        try {
+            writer = new PrintWriter(file);
+        } catch (FileNotFoundException e) {
+            try {
+                if (!file.createNewFile())
+                    e.printStackTrace();
+            } catch (IOException e1) {
+                e.printStackTrace();
+                e1.printStackTrace();
+            }
+        }
+
+        if (writer != null) {
+            if (lastImportFile != null)
+                writer.println("lastImportFile=" + lastImportFile.getAbsolutePath());
+            if (lastExportFile != null)
+                writer.println("lastExportFile=" + lastExportFile.getAbsolutePath());
+            if (lastSaveFile != null)
+                writer.println("lastSaveFile=" + lastSaveFile.getAbsolutePath());
+
+            writer.close();
+        }
+    }
+
     private void importFile() {
-        FileDialog dialog = new FileDialog(jFrame, "Choose a Screenshot");
-        dialog.setMode(FileDialog.LOAD);
+        FgFileDialog dialog = new FgFileDialog(jFrame, "Choose a Screenshot", FileDialog.LOAD);
         dialog.setFilenameFilter((dir, name) -> name.endsWith(".png") || name.endsWith("jpg") || name.endsWith("jpeg"));
+        dialog.setFile(lastImportFile != null ? lastImportFile.getAbsolutePath() : PATH_IMPORT_FOLDER);
         dialog.setVisible(true);
 
-        String file = dialog.getFile();
-        if (file != null) {
+        String fileString = dialog.getFile();
+        if (fileString != null) {
+            File file = new File(dialog.getDirectory(), fileString);
             try {
-                jScreenshotViewer.setScreenshot(new File(dialog.getDirectory(), file));
+                jScreenshotViewer.setScreenshot(file);
+                lastImportFile = file;
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -314,14 +387,21 @@ public class ScreenshotMaker {
     }
 
     private void exportFile() {
-        FileDialog dialog = new FileDialog(jFrame, "Export To...");
-        dialog.setMode(FileDialog.SAVE);
+        FgFileDialog dialog = new FgFileDialog(jFrame, "Export To...", FileDialog.SAVE);
         dialog.setFilenameFilter((dir, name) -> name.endsWith("png"));
+        dialog.setFile(lastExportFile != null ?
+                lastExportFile.getAbsolutePath() :
+                String.format(PATH_EXPORT_FILE, (file != null ?
+                        file.getName().substring(0, file.getName().length() - 3) : "untitled"))
+        );
         dialog.setVisible(true);
 
-        String file = dialog.getFile();
-        if (file != null)
-            jScreenshotViewer.toFile(new File(dialog.getDirectory(), file));
+        String fileString = dialog.getFile();
+        if (fileString != null) {
+            File file = new File(dialog.getDirectory(), fileString);
+            jScreenshotViewer.toFile(file);
+            lastExportFile = file;
+        }
     }
 
     private void fromFile(File file, boolean newWindow) {
@@ -403,9 +483,9 @@ public class ScreenshotMaker {
     private void toFile(boolean ignoreFile) {
         File file = this.file;
         if (file == null || ignoreFile) {
-            FileDialog dialog = new FileDialog(jFrame, "Save As...");
-            dialog.setMode(FileDialog.SAVE);
+            FgFileDialog dialog = new FgFileDialog(jFrame, "Save As...", FileDialog.SAVE);
             dialog.setFilenameFilter((dir, name) -> name.endsWith(".sm"));
+            dialog.setFile(lastSaveFile != null ? lastSaveFile.getAbsolutePath() : PATH_SAVE_FILE);
             dialog.setVisible(true);
 
             String fileString = dialog.getFile();
@@ -434,7 +514,7 @@ public class ScreenshotMaker {
                 writer.println(jExportSizeComboBox.getSelectedIndex());
 
                 writer.close();
-                this.file = file;
+                this.file = lastSaveFile = file;
                 jFrame.setTitle(file.getName());
             }
         }
