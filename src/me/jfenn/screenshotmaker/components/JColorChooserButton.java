@@ -1,4 +1,4 @@
-package me.jfenn.screenshotmaker;
+package me.jfenn.screenshotmaker.components;
 
 import javax.swing.*;
 import java.awt.*;

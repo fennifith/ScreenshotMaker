@@ -1,5 +1,8 @@
 package me.jfenn.screenshotmaker;
 
+import me.jfenn.screenshotmaker.components.JColorChooserButton;
+import me.jfenn.screenshotmaker.components.JScreenshotViewer;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -49,6 +52,7 @@ public class ScreenshotMaker {
     private File lastSaveFile;
     private String lastFont;
     private Integer lastExportSize;
+    private boolean isWhiteIcon;
 
     public ScreenshotMaker() {
         try {
@@ -63,7 +67,16 @@ public class ScreenshotMaker {
     }
 
     private void init() {
+        /*BufferedImage icon = null;
+        try {
+            icon = ImageIO.read(ScreenshotMaker.class.getResourceAsStream(isWhiteIcon ? "/assets/icon_white.png" : "/assets/icon_dark.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+
         jFrame = new JFrame("Screenshot Maker");
+        /*if (icon != null)
+            jFrame.setIconImage(icon);*/
         jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         jFrame.setMinimumSize(new Dimension(Math.min((int) (screenSize.width / 1.5), 600), Math.min((int) (screenSize.height / 1.5), 350)));
         jFrame.addWindowListener(new WindowAdapter() {
