@@ -467,7 +467,7 @@ public class ScreenshotMaker {
 
     private void importFile() {
         FgFileDialog dialog = new FgFileDialog(jFrame, "Choose a Screenshot", FileDialog.LOAD);
-        dialog.setFilenameFilter((dir, name) -> name.endsWith(".png") || name.endsWith("jpg") || name.endsWith("jpeg"));
+        dialog.setFilenameFilter((dir, name) -> name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg"));
         dialog.setFile(lastImportFile != null ? lastImportFile.getAbsolutePath() : PATH_IMPORT_FOLDER);
         dialog.setVisible(true);
 
@@ -485,7 +485,7 @@ public class ScreenshotMaker {
 
     private void exportFile() {
         FgFileDialog dialog = new FgFileDialog(jFrame, "Export To...", FileDialog.SAVE);
-        dialog.setFilenameFilter((dir, name) -> name.endsWith("png"));
+        dialog.setFilenameFilter((dir, name) -> name.endsWith(".png"));
         dialog.setFile(lastExportFile != null ?
                 lastExportFile.getAbsolutePath() :
                 String.format(PATH_EXPORT_FILE, (file != null ?
