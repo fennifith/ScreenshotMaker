@@ -46,7 +46,7 @@ public class JColorChooserButton extends JButton implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        setColor(JColorChooser.showDialog(null, "Choose a color", color));
+        setColor(JColorChooser.showDialog(this, "Choose a color", color));
     }
 
     private static ImageIcon createIcon(Color main, int width, int height) {

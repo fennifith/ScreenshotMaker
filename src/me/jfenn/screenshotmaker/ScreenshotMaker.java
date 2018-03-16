@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 public class ScreenshotMaker {
 
-    private static final int VERSION = 1;
+    private static final int FILE_FORMAT_VERSION = 1;
     private static final String PATH_CONFIG_FILE = System.getProperty("user.home") + "/.config/screenshotmaker/main.conf";
     public static final String PATH_IMPORT_FOLDER = System.getProperty("user.home") + "/Pictures/Screenshots";
     private static final String PATH_EXPORT_FILE = System.getProperty("user.home") + "/Pictures/%1$s.png";
@@ -584,7 +584,7 @@ public class ScreenshotMaker {
 
             if (scanner != null) {
                 String[] version = scanner.nextLine().split("=");
-                if (version.length > 1 && version[1].equals(VERSION + "")) {
+                if (version.length > 1 && version[1].equals(FILE_FORMAT_VERSION + "")) {
                     while (scanner.hasNext()) {
                         String[] line = scanner.nextLine().split("=");
                         if (line.length > 1) {
@@ -691,7 +691,7 @@ public class ScreenshotMaker {
             }
 
             if (writer != null) {
-                writer.println("v=" + VERSION);
+                writer.println("v=" + FILE_FORMAT_VERSION);
                 writer.println("title=" + jTitleTextField.getText());
                 writer.println("description=" + jDescriptionTextField.getText());
                 writer.println("textSize=" + (int) jTextSizeSpinner.getValue());
