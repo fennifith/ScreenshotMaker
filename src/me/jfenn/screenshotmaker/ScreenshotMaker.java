@@ -3,6 +3,7 @@ package me.jfenn.screenshotmaker;
 import me.jfenn.screenshotmaker.components.JColorChooserButton;
 import me.jfenn.screenshotmaker.components.JScreenshotViewer;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -10,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -66,17 +68,21 @@ public class ScreenshotMaker {
         init();
     }
 
-    private void init() {
-        /*BufferedImage icon = null;
+    private void setIcon(JFrame jFrame) {
+        BufferedImage icon = null;
         try {
-            icon = ImageIO.read(ScreenshotMaker.class.getResourceAsStream(isWhiteIcon ? "/assets/icon_white.png" : "/assets/icon_dark.png"));
+            icon = ImageIO.read(ScreenshotMaker.class.getResourceAsStream(isWhiteIcon ? "/assets/icon_white.png" : "/assets/icon_black.png"));
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
 
+        if (icon != null)
+            jFrame.setIconImage(icon);
+    }
+
+    private void init() {
         jFrame = new JFrame("Screenshot Maker");
-        /*if (icon != null)
-            jFrame.setIconImage(icon);*/
+        setIcon(jFrame);
         jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         jFrame.setMinimumSize(new Dimension(Math.min((int) (screenSize.width / 1.5), 600), Math.min((int) (screenSize.height / 1.5), 350)));
         jFrame.addWindowListener(new WindowAdapter() {
@@ -138,6 +144,20 @@ public class ScreenshotMaker {
         jFileMenu.add(jExportMenu);
 
         jMenuBar.add(jFileMenu);
+
+        JMenu jPreferencesMenu = new JMenu("Preferences");
+
+        JMenuItem jIconColorMenu = new JMenuItem("Icon Color");
+        jIconColorMenu.addActionListener(e -> {
+            Object selected = JOptionPane.showInputDialog(null, null, "Icon Color", -1, null, new String[]{"Black", "White"}, isWhiteIcon ? "White" : "Black");
+            if (selected != null && selected instanceof String)
+                isWhiteIcon = selected.toString().equals("White");
+
+            setIcon(jFrame);
+        });
+        jPreferencesMenu.add(jIconColorMenu);
+
+        jMenuBar.add(jPreferencesMenu);
 
         JMenu jHelpMenu = new JMenu("Help");
 
@@ -365,6 +385,9 @@ public class ScreenshotMaker {
                 String[] pref = scanner.nextLine().split("=");
                 if (pref.length > 1) {
                     switch (pref[0]) {
+                        case "isWhiteIcon":
+                            isWhiteIcon = Boolean.parseBoolean(pref[1]);
+                            break;
                         case "lastImportFile":
                             lastImportFile = new File(pref[1]);
                             break;
@@ -408,6 +431,7 @@ public class ScreenshotMaker {
         }
 
         if (writer != null) {
+            writer.println("isWhiteIcon=" + isWhiteIcon);
             if (lastImportFile != null)
                 writer.println("lastImportFile=" + lastImportFile.getAbsolutePath());
             if (lastExportFile != null)
