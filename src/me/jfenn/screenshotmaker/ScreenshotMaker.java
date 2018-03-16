@@ -2,6 +2,7 @@ package me.jfenn.screenshotmaker;
 
 import me.jfenn.screenshotmaker.components.JColorChooserButton;
 import me.jfenn.screenshotmaker.components.JScreenshotViewer;
+import me.jfenn.screenshotmaker.data.FrameData;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -19,7 +20,9 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -55,6 +58,7 @@ public class ScreenshotMaker {
     private String lastFont;
     private Integer lastExportSize;
     private boolean isWhiteIcon;
+    private List<FrameData> frames;
 
     public ScreenshotMaker() {
         try {
@@ -63,6 +67,7 @@ public class ScreenshotMaker {
             e.printStackTrace();
         }
 
+        frames = new ArrayList<>();
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         readConfig();
         init();
@@ -147,7 +152,7 @@ public class ScreenshotMaker {
 
         JMenu jPreferencesMenu = new JMenu("Preferences");
 
-        JMenuItem jIconColorMenu = new JMenuItem("Icon Color");
+        JMenuItem jIconColorMenu = new JMenuItem("TaskBar Icon Color");
         jIconColorMenu.addActionListener(e -> {
             Object selected = JOptionPane.showInputDialog(null, null, "Icon Color", -1, null, new String[]{"Black", "White"}, isWhiteIcon ? "White" : "Black");
             if (selected != null && selected instanceof String)
@@ -156,6 +161,12 @@ public class ScreenshotMaker {
             setIcon(jFrame);
         });
         jPreferencesMenu.add(jIconColorMenu);
+
+        JMenuItem jFramesMenu = new JMenuItem("Edit Device Frames...");
+        jFramesMenu.addActionListener(e -> {
+
+        });
+        jPreferencesMenu.add(jFramesMenu);
 
         jMenuBar.add(jPreferencesMenu);
 
@@ -388,6 +399,11 @@ public class ScreenshotMaker {
                         case "isWhiteIcon":
                             isWhiteIcon = Boolean.parseBoolean(pref[1]);
                             break;
+                        case "frame":
+                            FrameData frame = FrameData.fromString(pref[1]);
+                            if (frame != null)
+                                frames.add(frame);
+                            break;
                         case "lastImportFile":
                             lastImportFile = new File(pref[1]);
                             break;
@@ -432,6 +448,8 @@ public class ScreenshotMaker {
 
         if (writer != null) {
             writer.println("isWhiteIcon=" + isWhiteIcon);
+            for (FrameData frame : frames)
+                writer.println("frame=" + frame);
             if (lastImportFile != null)
                 writer.println("lastImportFile=" + lastImportFile.getAbsolutePath());
             if (lastExportFile != null)

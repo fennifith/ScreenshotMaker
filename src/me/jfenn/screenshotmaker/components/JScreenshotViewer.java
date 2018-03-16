@@ -1,5 +1,8 @@
 package me.jfenn.screenshotmaker.components;
 
+import me.jfenn.screenshotmaker.data.FrameData;
+import me.jfenn.screenshotmaker.utils.ImageUtils;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -17,8 +20,7 @@ public class JScreenshotViewer extends JComponent {
     private Color textColor, backgroundColor;
     private int exportHeight;
 
-    private BufferedImage frame, resizedFrame;
-    int frameSide, frameTop;
+    private FrameData frame;
     private BufferedImage screenshot, resizedScreenshot;
 
     public JScreenshotViewer() {
@@ -30,14 +32,7 @@ public class JScreenshotViewer extends JComponent {
         backgroundColor = Color.BLACK;
         exportHeight = 1920;
 
-        try {
-            frame = ImageIO.read(JScreenshotViewer.class.getResourceAsStream("/assets/pixel_2_frame.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        frameSide = 140;
-        frameTop = 300;
+        frame = FrameData.DEFAULTS[0];
     }
 
     public void setTitle(String title) {
@@ -152,20 +147,18 @@ public class JScreenshotViewer extends JComponent {
                 start += fontMetrics.getHeight();
             }
 
-            if (frame != null && (resizedFrame == null || resizedFrame.getWidth() != (int) (width * 0.9))) {
-                resizedFrame = progressiveResize(frame, (int) (width * 0.9));
-            }
+            BufferedImage resizedFrame = frame.getResizedFrame((int) (width * 0.9));
 
             if (resizedFrame != null) {
                 start += (offset * height / 4);
 
-                int frameSide = this.frameSide * resizedFrame.getWidth() / frame.getWidth();
-                int frameTop = this.frameTop * resizedFrame.getHeight() / frame.getHeight();
+                int frameSide = frame.getSide() * resizedFrame.getWidth() / frame.getWidth();
+                int frameTop = frame.getTop() * resizedFrame.getHeight() / frame.getHeight();
 
                 g2.drawImage(resizedFrame, (width / 2) - (resizedFrame.getWidth() / 2), (int) (reversePosition ? height - start - resizedFrame.getHeight() : start), null);
 
                 if (screenshot != null && (resizedScreenshot == null || resizedScreenshot.getWidth() != resizedFrame.getWidth() - (frameSide * 2))) {
-                    resizedScreenshot = progressiveResize(screenshot, resizedFrame.getWidth() - (frameSide * 2));
+                    resizedScreenshot = ImageUtils.progressiveResize(screenshot, resizedFrame.getWidth() - (frameSide * 2));
                 }
 
                 start += frameTop;
@@ -192,39 +185,6 @@ public class JScreenshotViewer extends JComponent {
     @Override
     public Dimension getSize() {
         return new Dimension((getHeight() * 720) / 1280, getHeight());
-    }
-
-    private static BufferedImage progressiveResize(BufferedImage source, int width) {
-        int height = width * source.getHeight() / source.getWidth();
-        int w = Math.max(source.getWidth() / 2, width);
-        int h = Math.max(source.getHeight() / 2, height);
-
-        BufferedImage img = commonResize(source, w, h, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-
-        while (w != width || h != height) {
-            BufferedImage prev = img;
-            w = Math.max(w / 2, width);
-            h = Math.max(h / 2, height);
-            img = commonResize(prev, w, h, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-
-            prev.flush();
-        }
-
-        return img;
-    }
-
-    private static BufferedImage commonResize(BufferedImage source, int width, int height, Object hint) {
-        BufferedImage img = new BufferedImage(width, height, source.getType());
-        Graphics2D g = img.createGraphics();
-
-        try {
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, hint);
-            g.drawImage(source, 0, 0, width, height, null);
-        } catch (Exception ignored) {
-        }
-
-        g.dispose();
-        return img;
     }
 
 }
