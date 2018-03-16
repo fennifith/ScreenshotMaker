@@ -1,4 +1,4 @@
-package me.jfenn.screenshotmaker;
+package me.jfenn.screenshotmaker.dialogs;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +16,6 @@ public class FgFileDialog extends FileDialog {
     @Override
     public void setVisible(boolean b) {
         super.setVisible(b);
-        if (b) SwingUtilities.invokeLater(() -> frame.toFront());
+        if (b && frame != null) SwingUtilities.invokeLater(() -> frame.toFront());
     }
 }

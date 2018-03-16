@@ -3,6 +3,9 @@ package me.jfenn.screenshotmaker;
 import me.jfenn.screenshotmaker.components.JColorChooserButton;
 import me.jfenn.screenshotmaker.components.JScreenshotViewer;
 import me.jfenn.screenshotmaker.data.FrameData;
+import me.jfenn.screenshotmaker.dialogs.FgFileDialog;
+import me.jfenn.screenshotmaker.dialogs.FrameEditorDialog;
+import me.jfenn.screenshotmaker.dialogs.ListDialog;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -30,7 +33,7 @@ public class ScreenshotMaker {
 
     private static final int VERSION = 1;
     private static final String PATH_CONFIG_FILE = System.getProperty("user.home") + "/.config/screenshotmaker/main.conf";
-    private static final String PATH_IMPORT_FOLDER = System.getProperty("user.home") + "/Pictures/Screenshots";
+    public static final String PATH_IMPORT_FOLDER = System.getProperty("user.home") + "/Pictures/Screenshots";
     private static final String PATH_EXPORT_FILE = System.getProperty("user.home") + "/Pictures/%1$s.png";
     private static final String PATH_SAVE_FILE = System.getProperty("user.home") + "/ScreenshotMaker/untitled.sm";
 
@@ -164,7 +167,21 @@ public class ScreenshotMaker {
 
         JMenuItem jFramesMenu = new JMenuItem("Edit Device Frames...");
         jFramesMenu.addActionListener(e -> {
+            ListDialog<FrameData> frameDialog = new ListDialog<>(jFrame, "Edit Frames", frames);
+            frameDialog.setActionListener(new ListDialog.ListActionListener<FrameData>() {
+                @Override
+                public void performAction(ListDialog<FrameData> dialog, FrameData item) {
+                    FrameEditorDialog editorDialog = new FrameEditorDialog(jFrame, item);
+                    editorDialog.setActionListener(dialog::modify);
+                    editorDialog.show();
+                }
 
+                @Override
+                public void onModified(List<FrameData> list) {
+                    //TODO: change the thing
+                }
+            });
+            frameDialog.show();
         });
         jPreferencesMenu.add(jFramesMenu);
 

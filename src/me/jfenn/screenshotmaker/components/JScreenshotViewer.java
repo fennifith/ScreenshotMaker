@@ -91,6 +91,11 @@ public class JScreenshotViewer extends JComponent {
         repaint();
     }
 
+    public void setFrame(FrameData frame) {
+        this.frame = frame;
+        repaint();
+    }
+
     public void toFile(File file) {
         BufferedImage image = new BufferedImage((exportHeight * 9) / 16, exportHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
@@ -165,6 +170,11 @@ public class JScreenshotViewer extends JComponent {
 
                 if (resizedScreenshot != null) {
                     g2.drawImage(resizedScreenshot, (width / 2) - (resizedScreenshot.getWidth() / 2), (int) (reversePosition ? height - start - resizedScreenshot.getHeight() : start), null);
+                } else {
+                    int screenshotWidth = resizedFrame.getWidth() - (frameSide * 2);
+                    int screenshotHeight = (screenshotWidth * 16) / 9;
+                    g2.setColor(Color.GRAY);
+                    g2.fillRect((width / 2) - (screenshotWidth / 2), (int) (reversePosition ? height - start - screenshotHeight : start), screenshotWidth, screenshotHeight);
                 }
             }
         }

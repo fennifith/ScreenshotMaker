@@ -1,6 +1,7 @@
 package me.jfenn.screenshotmaker.data;
 
 import com.sun.istack.internal.Nullable;
+import me.jfenn.screenshotmaker.interfaces.Nameable;
 import me.jfenn.screenshotmaker.utils.ImageUtils;
 
 import javax.imageio.ImageIO;
@@ -10,7 +11,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FrameData {
+public class FrameData implements Nameable {
 
     public static FrameData[] DEFAULTS = new FrameData[]{
             new FrameData("Pixel 2", "/assets/pixel_2_frame.png", 140, 300)
@@ -63,10 +64,21 @@ public class FrameData {
         if (images.containsKey(width))
             return images.get(width);
         else {
-            BufferedImage resizedImage = ImageUtils.progressiveResize(getFrame(), width);
-            images.put(width, resizedImage);
-            return resizedImage;
+            BufferedImage frame = getFrame();
+            if (frame != null) {
+                BufferedImage resizedImage = ImageUtils.progressiveResize(frame, width);
+                images.put(width, resizedImage);
+                return resizedImage;
+            } else return null;
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public File getFile() {
+        return file;
     }
 
     public int getSide() {
@@ -85,6 +97,14 @@ public class FrameData {
         return image != null ? image.getHeight() : null;
     }
 
+    public void setSide(int side) {
+        frameSide = side;
+    }
+
+    public void setTop(int top) {
+        frameTop = top;
+    }
+
     @Override
     public String toString() {
         return name + "," + file.getAbsolutePath() + "," + frameSide + "," + frameTop;
@@ -101,5 +121,10 @@ public class FrameData {
         }
 
         return null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof FrameData && name.equals(((FrameData) obj).name);
     }
 }
