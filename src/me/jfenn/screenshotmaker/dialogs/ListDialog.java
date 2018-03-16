@@ -12,6 +12,7 @@ public class ListDialog<T extends Nameable> {
     private JList<String> jList;
     private JDialog dialog;
     private ListActionListener<T> listener;
+    private boolean ignoreSelection;
 
     public ListDialog(Component parent, String title, List<T> list) {
         this.list = list;
@@ -21,7 +22,9 @@ public class ListDialog<T extends Nameable> {
 
         jList = new JList<>(names);
         jList.addListSelectionListener(e -> {
-            if (listener != null)
+            if (ignoreSelection)
+                ignoreSelection = false;
+            else if (listener != null)
                 listener.performAction(this, getSelectedItem());
         });
 
@@ -59,7 +62,7 @@ public class ListDialog<T extends Nameable> {
             list.set(list.indexOf(originalItem), newItem);
         else if (newItem != null) {
             if (list.contains(newItem)) {
-                JOptionPane.showMessageDialog(null, "An item already exists with this name.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dialog, "An item already exists with this name.", "Error", JOptionPane.ERROR_MESSAGE);
             } else list.add(newItem);
         } else if (originalItem != null)
             list.remove(originalItem);
@@ -68,6 +71,7 @@ public class ListDialog<T extends Nameable> {
         for (int i = 0; i < list.size(); i++)
             names[i] = list.get(i).getName();
 
+        ignoreSelection = true;
         jList.setListData(names);
         dialog.pack();
     }

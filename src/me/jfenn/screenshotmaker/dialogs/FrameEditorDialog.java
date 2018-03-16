@@ -29,12 +29,14 @@ public class FrameEditorDialog {
         originalFrame = frame;
         name = frame != null ? frame.getName() : "New Frame";
         file = frame != null ? frame.getFile() : null;
-        frameSide = frame != null ? frame.getSide() : 0;
-        frameTop = frame != null ? frame.getTop() : 0;
+        frameSide = frame != null ? frame.getSide() : 140;
+        frameTop = frame != null ? frame.getTop() : 300;
 
         tempFrame = new FrameData("", file, frameSide, frameTop);
 
         jScreenshotViewer = new JScreenshotViewer();
+        jScreenshotViewer.setTitle("");
+        jScreenshotViewer.setDescription("");
         jScreenshotViewer.setBackgroundColor(Color.LIGHT_GRAY);
         jScreenshotViewer.setTextColor(Color.DARK_GRAY);
         jScreenshotViewer.setFrame(tempFrame);
@@ -42,15 +44,33 @@ public class FrameEditorDialog {
         JButton okButton = new JButton("OK");
         okButton.addActionListener(e -> {
             if (file != null) {
-                if (listener != null)
-                    listener.onEdit(originalFrame, new FrameData(name, file, frameSide, frameTop));
+                if (!name.isEmpty()) {
+                    for (FrameData defaultFrame : FrameData.DEFAULTS) {
+                        if (defaultFrame.getName().equals(name)) {
+                            JOptionPane.showMessageDialog(dialog, "An item already exists with this name.", "Error", JOptionPane.ERROR_MESSAGE);
+                            hide();
+                            return;
+                        }
+                    }
+
+                    if (listener != null)
+                        listener.onEdit(originalFrame, new FrameData(name, file, frameSide, frameTop));
+                } else
+                    JOptionPane.showMessageDialog(dialog, "You must choose a name for the frame!", "Error", JOptionPane.ERROR_MESSAGE);
             } else
-                JOptionPane.showMessageDialog(null, "You must pick an image to use as the frame!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dialog, "You must pick an image to use as the frame!", "Error", JOptionPane.ERROR_MESSAGE);
             hide();
         });
 
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(e -> hide());
+
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.addActionListener(e -> {
+            if (listener != null)
+                listener.onEdit(originalFrame, null);
+            hide();
+        });
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -73,6 +93,12 @@ public class FrameEditorDialog {
             @Override
             public void keyReleased(KeyEvent e) {
                 name = jNameTextField.getText();
+                if (name.contains(",")) {
+                    name = name.replaceAll(",", "");
+                    jNameTextField.setText(name);
+                }
+
+                name = name.trim();
             }
         });
         jInputPanel.add(jNameTextField);
@@ -105,8 +131,9 @@ public class FrameEditorDialog {
         panel.add(BorderLayout.EAST, jInputPanel);
 
         JOptionPane optionPane = new JOptionPane(panel);
-        optionPane.setOptions(new JButton[]{okButton, cancelButton});
+        optionPane.setOptions(originalFrame != null ? new JButton[]{okButton, cancelButton, deleteButton} : new JButton[]{okButton, cancelButton});
         dialog = optionPane.createDialog(parent, frame == null ? "New Frame" : "Edit Frame");
+        dialog.setMinimumSize(new Dimension(700, 500));
         dialog.pack();
     }
 

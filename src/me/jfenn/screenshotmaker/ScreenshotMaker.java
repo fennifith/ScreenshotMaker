@@ -51,6 +51,7 @@ public class ScreenshotMaker {
     private JSpinner jOffsetSpinner;
     private JColorChooserButton jTextColorChooserButton;
     private JColorChooserButton jBackgroundColorChooserButton;
+    private JComboBox<String> jDeviceFrameComboBox;
     private JComboBox jExportSizeComboBox;
     private JButton jImportButton;
     private JButton jExportButton;
@@ -92,7 +93,7 @@ public class ScreenshotMaker {
         jFrame = new JFrame("Screenshot Maker");
         setIcon(jFrame);
         jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        jFrame.setMinimumSize(new Dimension(Math.min((int) (screenSize.width / 1.5), 600), Math.min((int) (screenSize.height / 1.5), 350)));
+        jFrame.setMinimumSize(new Dimension(Math.min((int) (screenSize.width / 1.5), 700), Math.min((int) (screenSize.height / 1.5), 350)));
         jFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -178,7 +179,15 @@ public class ScreenshotMaker {
 
                 @Override
                 public void onModified(List<FrameData> list) {
-                    //TODO: change the thing
+                    frames = list;
+                    jDeviceFrameComboBox.removeAllItems();
+                    for (FrameData frame : FrameData.DEFAULTS)
+                        jDeviceFrameComboBox.addItem(frame.getName());
+                    for (FrameData frame : list)
+                        jDeviceFrameComboBox.addItem(frame.getName());
+
+                    jDeviceFrameComboBox.setSelectedIndex(0);
+                    jScreenshotViewer.setFrame(FrameData.DEFAULTS[0]);
                 }
             });
             frameDialog.show();
@@ -343,6 +352,31 @@ public class ScreenshotMaker {
             onValueChange();
         });
         jInputPanel.add(jBackgroundColorChooserButton);
+
+        String[] frameNames = new String[FrameData.DEFAULTS.length + frames.size()];
+        for (int i = 0; i < FrameData.DEFAULTS.length; i++)
+            frameNames[i] = FrameData.DEFAULTS[i].getName();
+        for (int i = 0; i < frames.size(); i++)
+            frameNames[i + FrameData.DEFAULTS.length] = frames.get(i).getName();
+
+        jInputPanel.add(new JLabel("Device Frame"));
+        jDeviceFrameComboBox = new JComboBox<>(frameNames);
+        jDeviceFrameComboBox.addActionListener(e -> {
+            String selectedName = (String) jDeviceFrameComboBox.getSelectedItem();
+            for (FrameData frame : FrameData.DEFAULTS) {
+                if (frame.getName().equals(selectedName)) {
+                    jScreenshotViewer.setFrame(frame);
+                    onValueChange();
+                }
+            }
+            for (FrameData frame : frames) {
+                if (frame.getName().equals(selectedName)) {
+                    jScreenshotViewer.setFrame(frame);
+                    onValueChange();
+                }
+            }
+        });
+        jInputPanel.add(jDeviceFrameComboBox);
 
         jInputPanel.add(new JLabel("Export Size"));
         jExportSizeComboBox = new JComboBox<>(new String[]{"720x1280", "1080x1920"});
@@ -606,6 +640,9 @@ public class ScreenshotMaker {
                                     } catch (NumberFormatException ignored) {
                                     }
                                     break;
+                                case "deviceFrame":
+                                    jDeviceFrameComboBox.setSelectedItem(line[1]);
+                                    break;
                                 case "exportSize":
                                     try {
                                         int exportSize = Integer.parseInt(line[1]);
@@ -663,6 +700,7 @@ public class ScreenshotMaker {
                 writer.println("offset=" + (int) jOffsetSpinner.getValue());
                 writer.println("textColor=" + jTextColorChooserButton.getColor().getRGB());
                 writer.println("backgroundColor=" + jBackgroundColorChooserButton.getColor().getRGB());
+                writer.println("deviceFrame=" + jDeviceFrameComboBox.getSelectedItem());
                 writer.println("exportSize=" + jExportSizeComboBox.getSelectedIndex());
 
                 writer.close();

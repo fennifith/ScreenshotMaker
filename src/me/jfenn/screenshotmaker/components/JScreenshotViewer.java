@@ -173,8 +173,10 @@ public class JScreenshotViewer extends JComponent {
                 } else {
                     int screenshotWidth = resizedFrame.getWidth() - (frameSide * 2);
                     int screenshotHeight = (screenshotWidth * 16) / 9;
-                    g2.setColor(Color.GRAY);
+                    g2.setColor(new Color(255, 255, 255, 150));
                     g2.fillRect((width / 2) - (screenshotWidth / 2), (int) (reversePosition ? height - start - screenshotHeight : start), screenshotWidth, screenshotHeight);
+                    g2.setColor(new Color(0, 0, 0, 150));
+                    g2.drawRect((width / 2) - (screenshotWidth / 2), (int) (reversePosition ? height - start - screenshotHeight : start), screenshotWidth, screenshotHeight);
                 }
             }
         }
