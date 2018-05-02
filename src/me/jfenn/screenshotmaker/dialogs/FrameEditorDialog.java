@@ -24,6 +24,7 @@ public class FrameEditorDialog {
     private File file;
     private int frameSide;
     private int frameTop;
+    private String ratio;
 
     public FrameEditorDialog(Component parent, @Nullable FrameData frame) {
         originalFrame = frame;
@@ -31,8 +32,9 @@ public class FrameEditorDialog {
         file = frame != null ? frame.getFile() : null;
         frameSide = frame != null ? frame.getSide() : 140;
         frameTop = frame != null ? frame.getTop() : 300;
+        ratio = frame != null ? frame.getRatioString() : "16/9";
 
-        tempFrame = new FrameData("", file, frameSide, frameTop);
+        tempFrame = new FrameData("", file, frameSide, frameTop, ratio);
 
         jScreenshotViewer = new JScreenshotViewer();
         jScreenshotViewer.setTitle("");
@@ -45,16 +47,19 @@ public class FrameEditorDialog {
         okButton.addActionListener(e -> {
             if (file != null) {
                 if (!name.isEmpty()) {
-                    for (FrameData defaultFrame : FrameData.DEFAULTS) {
-                        if (defaultFrame.getName().equals(name)) {
-                            JOptionPane.showMessageDialog(dialog, "An item already exists with this name.", "Error", JOptionPane.ERROR_MESSAGE);
-                            hide();
-                            return;
+                    if (!ratio.endsWith(":") && !ratio.startsWith(":")) {
+                        for (FrameData defaultFrame : FrameData.DEFAULTS) {
+                            if (defaultFrame.getName().equals(name)) {
+                                JOptionPane.showMessageDialog(dialog, "An item already exists with this name.", "Error", JOptionPane.ERROR_MESSAGE);
+                                hide();
+                                return;
+                            }
                         }
-                    }
 
-                    if (listener != null)
-                        listener.onEdit(originalFrame, new FrameData(name, file, frameSide, frameTop));
+                        if (listener != null)
+                            listener.onEdit(originalFrame, new FrameData(name, file, frameSide, frameTop, ratio));
+                    } else
+                        JOptionPane.showMessageDialog(dialog, "The ratio must be in an \"X:Y\" format!", "Error", JOptionPane.ERROR_MESSAGE);
                 } else
                     JOptionPane.showMessageDialog(dialog, "You must choose a name for the frame!", "Error", JOptionPane.ERROR_MESSAGE);
             } else
@@ -127,6 +132,35 @@ public class FrameEditorDialog {
         });
         jInputPanel.add(jTopSpinner);
 
+        jInputPanel.add(new JLabel("Screenshot Ratio"));
+        JTextField jRatioTextField = new JTextField(ratio, 10);
+        jRatioTextField.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                ratio = jRatioTextField.getText();
+                String newRatio = ratio.replaceAll("[^\\d:]", "");
+                if (!newRatio.equals(ratio)) {
+                    ratio = newRatio;
+                    jRatioTextField.setText(newRatio);
+                }
+
+                if (ratio.indexOf(":") > 0 && !ratio.endsWith(":")) {
+                    onValueChange();
+                }
+            }
+        });
+        jInputPanel.add(jRatioTextField);
+
         panel.add(BorderLayout.WEST, jScreenshotViewer);
         panel.add(BorderLayout.EAST, jInputPanel);
 
@@ -141,8 +175,9 @@ public class FrameEditorDialog {
         if (file != null && file.equals(tempFrame.getFile())) {
             tempFrame.setSide(frameSide);
             tempFrame.setTop(frameTop);
+            tempFrame.setRatio(ratio);
         } else {
-            tempFrame = new FrameData("", file, frameSide, frameTop);
+            tempFrame = new FrameData("", file, frameSide, frameTop, ratio);
         }
 
         jScreenshotViewer.setFrame(tempFrame);

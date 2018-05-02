@@ -113,11 +113,11 @@ public class JScreenshotViewer extends JComponent {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        paintScreenshot(g, getHeight());
+        paintScreenshot(g, Math.min(getHeight(), (int) (getWidth() * frame.getRatio())));
     }
 
     private void paintScreenshot(Graphics g, int height) {
-        int width = (height * 9) / 16;
+        int width = (int) ((float) height / frame.getRatio());
         g.setColor(backgroundColor);
         g.fillRect(0, 0, width, height);
 
@@ -172,7 +172,7 @@ public class JScreenshotViewer extends JComponent {
                     g2.drawImage(resizedScreenshot, (width / 2) - (resizedScreenshot.getWidth() / 2), (int) (reversePosition ? height - start - resizedScreenshot.getHeight() : start), null);
                 } else {
                     int screenshotWidth = resizedFrame.getWidth() - (frameSide * 2);
-                    int screenshotHeight = (screenshotWidth * 16) / 9;
+                    int screenshotHeight = (int) (screenshotWidth * frame.getRatio());
                     g2.setColor(new Color(255, 255, 255, 150));
                     g2.fillRect((width / 2) - (screenshotWidth / 2), (int) (reversePosition ? height - start - screenshotHeight : start), screenshotWidth, screenshotHeight);
                     g2.setColor(new Color(0, 0, 0, 150));

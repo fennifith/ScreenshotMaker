@@ -14,7 +14,7 @@ import java.util.Map;
 public class FrameData implements Nameable {
 
     public static final FrameData[] DEFAULTS = new FrameData[]{
-            new FrameData("Pixel 2", "/assets/pixel_2_frame.png", 140, 300)
+            new FrameData("Pixel 2", "/assets/pixel_2_frame.png", 140, 300, "16:9")
     };
 
     public static final int[] EXPORT_SIZES = new int[]{720, 1080, 1280, 1440, 1860, 2940};
@@ -24,27 +24,31 @@ public class FrameData implements Nameable {
     private String asset;
     private int frameSide;
     private int frameTop;
-    private float ratio;
+    private String ratio;
 
     private BufferedImage image;
     private Map<Integer, BufferedImage> images;
 
-    public FrameData(String name, String asset, int frameSide, int frameTop) {
+    public FrameData(String name, String asset, int frameSide, int frameTop, String ratio) {
         this.name = name;
         this.asset = asset;
         this.frameSide = frameSide;
         this.frameTop = frameTop;
         images = new HashMap<>();
-        ratio = 16f / 9f;
+        this.ratio = ratio.replace("/", ":");
+        if (!this.ratio.contains(":"))
+            this.ratio += ":1";
     }
 
-    public FrameData(String name, File file, int frameSide, int frameTop) {
+    public FrameData(String name, File file, int frameSide, int frameTop, String ratio) {
         this.name = name;
         this.file = file;
         this.frameSide = frameSide;
         this.frameTop = frameTop;
         images = new HashMap<>();
-        ratio = 16f / 9f;
+        this.ratio = ratio.replace("/", ":");
+        if (!this.ratio.contains(":"))
+            this.ratio += ":1";
     }
 
     @Nullable
@@ -110,25 +114,44 @@ public class FrameData implements Nameable {
         frameTop = top;
     }
 
+    public void setRatio(String ratio) {
+        this.ratio = ratio.replace("/", ":");
+        if (!this.ratio.contains(":"))
+            this.ratio += ":1";
+    }
+
+    public float getRatio() {
+        String[] numbers = ratio.split(":");
+        return Float.parseFloat(numbers[0]) / Float.parseFloat(numbers[1]);
+    }
+
+    public String getRatioString() {
+        return ratio;
+    }
+
     public String[] getExportSizes() {
         String[] sizes = new String[EXPORT_SIZES.length];
         for (int i = 0; i < EXPORT_SIZES.length; i++) {
-            sizes[i] = EXPORT_SIZES[i] + "x" + (int) (EXPORT_SIZES[i] * ratio);
+            sizes[i] = EXPORT_SIZES[i] + "x" + (int) (EXPORT_SIZES[i] * getRatio());
         }
         return sizes;
     }
 
     @Override
     public String toString() {
-        return name + "," + file.getAbsolutePath() + "," + frameSide + "," + frameTop;
+        return name + "," + file.getAbsolutePath() + "," + frameSide + "," + frameTop + "," + ratio;
     }
 
     @Nullable
     public static FrameData fromString(String string) {
         String[] values = string.split(",");
         if (values.length > 3) {
+            String ratio = "16:9";
+            if (values.length > 4)
+                ratio = values[4];
+
             try {
-                return new FrameData(values[0], new File(values[1]), Integer.parseInt(values[2]), Integer.parseInt(values[3]));
+                return new FrameData(values[0], new File(values[1]), Integer.parseInt(values[2]), Integer.parseInt(values[3]), ratio);
             } catch (Exception ignored) {
             }
         }
