@@ -24,6 +24,7 @@ public class FrameEditorDialog {
     private File file;
     private int frameSide;
     private int frameTop;
+    private int frameX;
     private String ratio;
 
     public FrameEditorDialog(Component parent, @Nullable FrameData frame) {
@@ -32,9 +33,10 @@ public class FrameEditorDialog {
         file = frame != null ? frame.getFile() : null;
         frameSide = frame != null ? frame.getSide() : 140;
         frameTop = frame != null ? frame.getTop() : 300;
+        frameX = frame != null ? frame.getOffsetX() : 0;
         ratio = frame != null ? frame.getRatioString() : "16/9";
 
-        tempFrame = new FrameData("", file, frameSide, frameTop, ratio);
+        tempFrame = new FrameData("", file, frameSide, frameTop, frameX, ratio);
 
         jScreenshotViewer = new JScreenshotViewer();
         jScreenshotViewer.setTitle("");
@@ -57,7 +59,7 @@ public class FrameEditorDialog {
                         }
 
                         if (listener != null)
-                            listener.onEdit(originalFrame, new FrameData(name, file, frameSide, frameTop, ratio));
+                            listener.onEdit(originalFrame, new FrameData(name, file, frameSide, frameTop, frameX, ratio));
                     } else
                         JOptionPane.showMessageDialog(dialog, "The ratio must be in an \"X:Y\" format!", "Error", JOptionPane.ERROR_MESSAGE);
                 } else
@@ -118,6 +120,7 @@ public class FrameEditorDialog {
 
         jInputPanel.add(new JLabel("Side Offset"));
         JSpinner jSideSpinner = new JSpinner(new SpinnerNumberModel(frameSide, 0, Integer.MAX_VALUE, 1));
+        ((JSpinner.DefaultEditor) jSideSpinner.getEditor()).getTextField().setColumns(10);
         jSideSpinner.addChangeListener(e -> {
             frameSide = (int) jSideSpinner.getValue();
             onValueChange();
@@ -126,13 +129,23 @@ public class FrameEditorDialog {
 
         jInputPanel.add(new JLabel("Top Offset"));
         JSpinner jTopSpinner = new JSpinner(new SpinnerNumberModel(frameTop, 0, Integer.MAX_VALUE, 1));
+        ((JSpinner.DefaultEditor) jTopSpinner.getEditor()).getTextField().setColumns(10);
         jTopSpinner.addChangeListener(e -> {
             frameTop = (int) jTopSpinner.getValue();
             onValueChange();
         });
         jInputPanel.add(jTopSpinner);
 
-        jInputPanel.add(new JLabel("Screenshot Ratio"));
+        jInputPanel.add(new JLabel("X Offset"));
+        JSpinner jXSpinner = new JSpinner(new SpinnerNumberModel(frameX, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
+        ((JSpinner.DefaultEditor) jXSpinner.getEditor()).getTextField().setColumns(10);
+        jXSpinner.addChangeListener(e -> {
+            frameX = (int) jXSpinner.getValue();
+            onValueChange();
+        });
+        jInputPanel.add(jXSpinner);
+
+        jInputPanel.add(new JLabel("Form Factor"));
         JTextField jRatioTextField = new JTextField(ratio, 10);
         jRatioTextField.addKeyListener(new KeyListener() {
             @Override
@@ -175,9 +188,10 @@ public class FrameEditorDialog {
         if (file != null && file.equals(tempFrame.getFile())) {
             tempFrame.setSide(frameSide);
             tempFrame.setTop(frameTop);
+            tempFrame.setOffsetX(frameX);
             tempFrame.setRatio(ratio);
         } else {
-            tempFrame = new FrameData("", file, frameSide, frameTop, ratio);
+            tempFrame = new FrameData("", file, frameSide, frameTop, frameX, ratio);
         }
 
         jScreenshotViewer.setFrame(tempFrame);

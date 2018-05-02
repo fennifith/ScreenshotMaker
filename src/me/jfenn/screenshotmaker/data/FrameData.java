@@ -14,11 +14,11 @@ import java.util.Map;
 public class FrameData implements Nameable {
 
     public static final FrameData[] DEFAULTS = new FrameData[]{
-            new FrameData("Pixel 2", "/assets/pixel_2_frame.png", 140, 300, "16:9"),
-            new FrameData("Nexus 5", "/assets/nexus_5_frame.png", 11, 58, "16:9"),
-            new FrameData("Galaxy Nexus", "/assets/galaxy_nexus_frame.png", 39, 86, "17:10"),
-            new FrameData("Galaxy Note", "/assets/galaxy_note_frame.png", 108, 102, "16:9"),
-            new FrameData("Alcatel", "/assets/alcatel_frame.png", 22, 82, "16:9")
+            new FrameData("Pixel 2", "/assets/pixel_2_frame.png", 140, 300, 0, "16:9"),
+            new FrameData("Nexus 5", "/assets/nexus_5_frame.png", 11, 58, 0, "16:9"),
+            new FrameData("Galaxy Nexus", "/assets/galaxy_nexus_frame.png", 39, 86, 0, "17:10"),
+            new FrameData("Galaxy Note", "/assets/galaxy_note_frame.png", 108, 102, 0, "16:9"),
+            new FrameData("Alcatel", "/assets/alcatel_frame.png", 22, 82, 0, "16:9")
     };
 
     public static final int[] EXPORT_SIZES = new int[]{720, 1080, 1280, 1440, 1860, 2940};
@@ -28,27 +28,30 @@ public class FrameData implements Nameable {
     private String asset;
     private int frameSide;
     private int frameTop;
+    private int offsetX;
     private String ratio;
 
     private BufferedImage image;
     private Map<Integer, BufferedImage> images;
 
-    public FrameData(String name, String asset, int frameSide, int frameTop, String ratio) {
+    public FrameData(String name, String asset, int frameSide, int frameTop, int offsetX, String ratio) {
         this.name = name;
         this.asset = asset;
         this.frameSide = frameSide;
         this.frameTop = frameTop;
+        this.offsetX = offsetX;
         images = new HashMap<>();
         this.ratio = ratio.replace("/", ":");
         if (!this.ratio.contains(":"))
             this.ratio += ":1";
     }
 
-    public FrameData(String name, File file, int frameSide, int frameTop, String ratio) {
+    public FrameData(String name, File file, int frameSide, int frameTop, int offsetX, String ratio) {
         this.name = name;
         this.file = file;
         this.frameSide = frameSide;
         this.frameTop = frameTop;
+        this.offsetX = offsetX;
         images = new HashMap<>();
         this.ratio = ratio.replace("/", ":");
         if (!this.ratio.contains(":"))
@@ -102,6 +105,10 @@ public class FrameData implements Nameable {
         return frameTop;
     }
 
+    public int getOffsetX() {
+        return offsetX;
+    }
+
     public Integer getWidth() {
         return image != null ? image.getWidth() : null;
     }
@@ -116,6 +123,10 @@ public class FrameData implements Nameable {
 
     public void setTop(int top) {
         frameTop = top;
+    }
+
+    public void setOffsetX(int offsetX) {
+        this.offsetX = offsetX;
     }
 
     public void setRatio(String ratio) {
@@ -150,12 +161,15 @@ public class FrameData implements Nameable {
     public static FrameData fromString(String string) {
         String[] values = string.split(",");
         if (values.length > 3) {
+            int offsetX = 0;
             String ratio = "16:9";
             if (values.length > 4)
-                ratio = values[4];
+                offsetX = Integer.parseInt(values[4]);
+            if (values.length > 5)
+                ratio = values[5];
 
             try {
-                return new FrameData(values[0], new File(values[1]), Integer.parseInt(values[2]), Integer.parseInt(values[3]), ratio);
+                return new FrameData(values[0], new File(values[1]), Integer.parseInt(values[2]), Integer.parseInt(values[3]), offsetX, ratio);
             } catch (Exception ignored) {
             }
         }

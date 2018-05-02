@@ -169,14 +169,14 @@ public class JScreenshotViewer extends JComponent {
                 start += frameTop;
 
                 if (resizedScreenshot != null) {
-                    g2.drawImage(resizedScreenshot, (width / 2) - (resizedScreenshot.getWidth() / 2), (int) (reversePosition ? height - start - resizedScreenshot.getHeight() : start), null);
+                    g2.drawImage(resizedScreenshot, (width / 2) - (resizedScreenshot.getWidth() / 2) + frame.getOffsetX(), (int) (reversePosition ? height - start - resizedScreenshot.getHeight() : start), null);
                 } else {
                     int screenshotWidth = resizedFrame.getWidth() - (frameSide * 2);
                     int screenshotHeight = (int) (screenshotWidth * frame.getRatio());
                     g2.setColor(new Color(255, 255, 255, 150));
-                    g2.fillRect((width / 2) - (screenshotWidth / 2), (int) (reversePosition ? height - start - screenshotHeight : start), screenshotWidth, screenshotHeight);
+                    g2.fillRect((width / 2) - (screenshotWidth / 2) + frame.getOffsetX(), (int) (reversePosition ? height - start - screenshotHeight : start), screenshotWidth, screenshotHeight);
                     g2.setColor(new Color(0, 0, 0, 150));
-                    g2.drawRect((width / 2) - (screenshotWidth / 2), (int) (reversePosition ? height - start - screenshotHeight : start), screenshotWidth, screenshotHeight);
+                    g2.drawRect((width / 2) - (screenshotWidth / 2) + frame.getOffsetX(), (int) (reversePosition ? height - start - screenshotHeight : start), screenshotWidth, screenshotHeight);
                 }
             }
         }
