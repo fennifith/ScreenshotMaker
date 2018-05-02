@@ -230,7 +230,7 @@ public class ScreenshotMaker {
         JMenuItem jReportMenu = new JMenuItem("Report an Issue");
         jReportMenu.addActionListener(e -> {
             try {
-                Desktop.getDesktop().browse(URI.create("https://github.com/TheAndroidMaster/ScreenshotMaker/issues/new"));
+                Desktop.getDesktop().browse(URI.create("https://jfenn.me/redirects/?t=github&d=ScreenshotMaker/issues/new"));
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
