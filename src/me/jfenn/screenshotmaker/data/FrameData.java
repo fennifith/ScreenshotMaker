@@ -13,15 +13,18 @@ import java.util.Map;
 
 public class FrameData implements Nameable {
 
-    public static FrameData[] DEFAULTS = new FrameData[]{
+    public static final FrameData[] DEFAULTS = new FrameData[]{
             new FrameData("Pixel 2", "/assets/pixel_2_frame.png", 140, 300)
     };
+
+    public static final int[] EXPORT_SIZES = new int[]{720, 1080, 1280, 1440, 1860, 2940};
 
     private String name;
     private File file;
     private String asset;
     private int frameSide;
     private int frameTop;
+    private float ratio;
 
     private BufferedImage image;
     private Map<Integer, BufferedImage> images;
@@ -32,6 +35,7 @@ public class FrameData implements Nameable {
         this.frameSide = frameSide;
         this.frameTop = frameTop;
         images = new HashMap<>();
+        ratio = 16f / 9f;
     }
 
     public FrameData(String name, File file, int frameSide, int frameTop) {
@@ -40,6 +44,7 @@ public class FrameData implements Nameable {
         this.frameSide = frameSide;
         this.frameTop = frameTop;
         images = new HashMap<>();
+        ratio = 16f / 9f;
     }
 
     @Nullable
@@ -103,6 +108,14 @@ public class FrameData implements Nameable {
 
     public void setTop(int top) {
         frameTop = top;
+    }
+
+    public String[] getExportSizes() {
+        String[] sizes = new String[EXPORT_SIZES.length];
+        for (int i = 0; i < EXPORT_SIZES.length; i++) {
+            sizes[i] = EXPORT_SIZES[i] + "x" + (int) (EXPORT_SIZES[i] * ratio);
+        }
+        return sizes;
     }
 
     @Override

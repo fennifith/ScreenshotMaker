@@ -363,23 +363,33 @@ public class ScreenshotMaker {
         jDeviceFrameComboBox = new JComboBox<>(frameNames);
         jDeviceFrameComboBox.addActionListener(e -> {
             String selectedName = (String) jDeviceFrameComboBox.getSelectedItem();
+            FrameData selectedFrame = null;
             for (FrameData frame : FrameData.DEFAULTS) {
                 if (frame.getName().equals(selectedName)) {
+                    selectedFrame = frame;
                     jScreenshotViewer.setFrame(frame);
                     onValueChange();
                 }
             }
             for (FrameData frame : frames) {
                 if (frame.getName().equals(selectedName)) {
+                    selectedFrame = frame;
                     jScreenshotViewer.setFrame(frame);
                     onValueChange();
+                }
+            }
+
+            if (selectedFrame != null) {
+                jExportSizeComboBox.removeAllItems();
+                for (String size : selectedFrame.getExportSizes()) {
+                    jExportSizeComboBox.addItem(size);
                 }
             }
         });
         jInputPanel.add(jDeviceFrameComboBox);
 
         jInputPanel.add(new JLabel("Export Size"));
-        jExportSizeComboBox = new JComboBox<>(new String[]{"720x1280", "1080x1920"});
+        jExportSizeComboBox = new JComboBox<>(FrameData.DEFAULTS[0].getExportSizes());
         int exportSize = lastExportSize != null ? lastExportSize : 1;
         jExportSizeComboBox.setSelectedIndex(exportSize);
         jScreenshotViewer.setExportSize(exportSize);
