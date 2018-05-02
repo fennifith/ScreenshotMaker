@@ -14,7 +14,11 @@ import java.util.Map;
 public class FrameData implements Nameable {
 
     public static final FrameData[] DEFAULTS = new FrameData[]{
-            new FrameData("Pixel 2", "/assets/pixel_2_frame.png", 140, 300, "16:9")
+            new FrameData("Pixel 2", "/assets/pixel_2_frame.png", 140, 300, "16:9"),
+            new FrameData("Nexus 5", "/assets/nexus_5_frame.png", 11, 58, "16:9"),
+            new FrameData("Galaxy Nexus", "/assets/galaxy_nexus_frame.png", 39, 86, "17:10"),
+            new FrameData("Galaxy Note", "/assets/galaxy_note_frame.png", 108, 102, "16:9"),
+            new FrameData("Alcatel", "/assets/alcatel_frame.png", 22, 82, "16:9")
     };
 
     public static final int[] EXPORT_SIZES = new int[]{720, 1080, 1280, 1440, 1860, 2940};
