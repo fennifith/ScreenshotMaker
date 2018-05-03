@@ -8,7 +8,7 @@ You might need to install [some recentish version of Java](https://java.com/en/d
 
 ### System Requirements
 
-I've only just gotten this thing to work on my laptop, so I have no idea what the requirements are. I have tested it a little on Windows, and although there are a few issues (all file chooser dialogs go to System32, and none of them restrict the file extensions like they're supposed to), it seems to be usable.
+I've only just gotten this thing to work on my laptop (a beautiful ThinkPad T520 running Arch Linux), so I have no idea what the requirements are. I have tested it a little on Windows, and although there are a few issues (all file chooser dialogs go to System32, and none of them restrict the file extensions like they're supposed to), it seems to be usable.
 
 ### Creating a Desktop Entry
 
