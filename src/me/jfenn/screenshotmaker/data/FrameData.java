@@ -16,7 +16,7 @@ public class FrameData implements Nameable {
     public static final FrameData[] DEFAULTS = new FrameData[]{
             new FrameData("Pixel 2", "/assets/pixel_2_frame.png", 140, 300, 0, "16:9"),
             new FrameData("Nexus 5", "/assets/nexus_5_frame.png", 12, 58, -1, "16:9"),
-            new FrameData("Galaxy Nexus", "/assets/galaxy_nexus_frame.png", 39, 86, -1, "17:10"),
+            new FrameData("Galaxy Nexus", "/assets/galaxy_nexus_frame.png", 36, 86, -1, "5:3"),
             new FrameData("Alcatel", "/assets/alcatel_frame.png", 22, 81, -2, "16:9")
     };
 
