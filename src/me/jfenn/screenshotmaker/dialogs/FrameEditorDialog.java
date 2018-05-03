@@ -34,7 +34,7 @@ public class FrameEditorDialog {
         frameSide = frame != null ? frame.getSide() : 140;
         frameTop = frame != null ? frame.getTop() : 300;
         frameX = frame != null ? frame.getOffsetX() : 0;
-        ratio = frame != null ? frame.getRatioString() : "16/9";
+        ratio = frame != null ? frame.getRatioString() : "16:9";
 
         tempFrame = new FrameData("", file, frameSide, frameTop, frameX, ratio);
 
