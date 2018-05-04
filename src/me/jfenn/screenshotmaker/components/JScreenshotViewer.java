@@ -139,18 +139,20 @@ public class JScreenshotViewer extends JComponent {
                 fontMetrics = g2.getFontMetrics();
 
                 g2.drawString(title, ((float) width / 2) - ((float) fontMetrics.stringWidth(title) / 2), start);
-                start += fontMetrics.getHeight();
+                start += fontMetrics.getHeight() * 0.75;
             }
 
-            g2.setFont(new Font(textFont, Font.PLAIN, (int) (((float) height / 400) * textSize)));
+            g2.setColor(new Color(textColor.getRed(), textColor.getGreen(), textColor.getBlue(), 170));
+
+            g2.setFont(new Font(textFont, Font.PLAIN, (int) (((float) height / 500) * textSize)));
             fontMetrics = g2.getFontMetrics();
 
             String[] descArr = description.split(" ");
-            List<String> descs = new ArrayList<>();
+            List<String> descList = new ArrayList<>();
             StringBuilder descBuilder = new StringBuilder();
             for (int i = 0; i <= descArr.length; i++) {
                 if (i == descArr.length || fontMetrics.getStringBounds(descBuilder + descArr[i] + " ", g).getWidth() > width * 0.85) {
-                    descs.add(descBuilder.toString());
+                    descList.add(descBuilder.toString());
 
                     if (i < descArr.length) {
                         descBuilder = new StringBuilder();
@@ -160,15 +162,18 @@ public class JScreenshotViewer extends JComponent {
             }
 
             if (reversePosition)
-                Collections.reverse(descs);
+                Collections.reverse(descList);
 
-            for (String desc : descs) {
+            for (String desc : descList) {
                 Rectangle2D bounds = fontMetrics.getStringBounds(desc, g);
                 g2.drawString(desc, ((float) width / 2) - ((float) bounds.getWidth() / 2), reversePosition ? height - start : start);
                 start += bounds.getHeight();
             }
 
             if (reversePosition) {
+                g2.setColor(textColor);
+
+                start += height * .02;
                 g2.setFont(new Font(textFont, Font.BOLD, (int) (((float) height / 300) * textSize)));
                 fontMetrics = g2.getFontMetrics();
 
