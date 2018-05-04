@@ -6,6 +6,7 @@ import me.jfenn.screenshotmaker.utils.ImageUtils;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -141,8 +142,20 @@ public class JScreenshotViewer extends JComponent {
             g2.setFont(new Font(textFont, Font.PLAIN, (int) (((float) height / 400) * textSize)));
             fontMetrics = g2.getFontMetrics();
 
-            g2.drawString(description, ((float) width / 2) - ((float) fontMetrics.stringWidth(description) / 2), reversePosition ? height - start : start);
-            start += fontMetrics.getHeight();
+            String[] descArr = description.split(" ");
+            StringBuilder descBuilder = new StringBuilder();
+            for (int i = 0; i <= descArr.length; i++) {
+                if (i == descArr.length || fontMetrics.getStringBounds(descBuilder + descArr[i] + " ", g).getWidth() > width * 0.85) {
+                    Rectangle2D bounds = fontMetrics.getStringBounds(descBuilder.toString(), g);
+                    g2.drawString(descBuilder.toString(), ((float) width / 2) - ((float) bounds.getWidth() / 2), reversePosition ? height - start : start);
+                    start += bounds.getHeight();
+
+                    if (i < descArr.length) {
+                        descBuilder = new StringBuilder();
+                        descBuilder.append(descArr[i]).append(" ");
+                    }
+                } else descBuilder.append(descArr[i]).append(" ");
+            }
 
             if (reversePosition) {
                 g2.setFont(new Font(textFont, Font.BOLD, (int) (((float) height / 300) * textSize)));
