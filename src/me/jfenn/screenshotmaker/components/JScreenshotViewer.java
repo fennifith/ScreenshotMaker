@@ -10,6 +10,9 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class JScreenshotViewer extends JComponent {
 
@@ -143,18 +146,26 @@ public class JScreenshotViewer extends JComponent {
             fontMetrics = g2.getFontMetrics();
 
             String[] descArr = description.split(" ");
+            List<String> descs = new ArrayList<>();
             StringBuilder descBuilder = new StringBuilder();
             for (int i = 0; i <= descArr.length; i++) {
                 if (i == descArr.length || fontMetrics.getStringBounds(descBuilder + descArr[i] + " ", g).getWidth() > width * 0.85) {
-                    Rectangle2D bounds = fontMetrics.getStringBounds(descBuilder.toString(), g);
-                    g2.drawString(descBuilder.toString(), ((float) width / 2) - ((float) bounds.getWidth() / 2), reversePosition ? height - start : start);
-                    start += bounds.getHeight();
+                    descs.add(descBuilder.toString());
 
                     if (i < descArr.length) {
                         descBuilder = new StringBuilder();
                         descBuilder.append(descArr[i]).append(" ");
                     }
                 } else descBuilder.append(descArr[i]).append(" ");
+            }
+
+            if (reversePosition)
+                Collections.reverse(descs);
+
+            for (String desc : descs) {
+                Rectangle2D bounds = fontMetrics.getStringBounds(desc, g);
+                g2.drawString(desc, ((float) width / 2) - ((float) bounds.getWidth() / 2), reversePosition ? height - start : start);
+                start += bounds.getHeight();
             }
 
             if (reversePosition) {
